@@ -60,6 +60,9 @@ public class SwerveDriveIOSpark implements SwerveDriveIO {
     private Voltage backRightDriveVolts = Volts.of(0);
     private Voltage backLeftDriveVolts = Volts.of(0);
 
+    // IMU
+    private final Pigeon2Gyro pigeon = new Pigeon2Gyro(SwerveDriveConstants.kIMUID);
+
     // PID
     private PIDController frontLeftAngleController;
     private PIDController frontRightAngleController;
@@ -280,8 +283,13 @@ public class SwerveDriveIOSpark implements SwerveDriveIO {
             new Rotation2d(getBackLeftAngle())
         );
 
-        // TODO: dummy code
-        ChassisSpeeds speeds = new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+        // Get setpoints
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            vxMetersPerSecond, 
+            vyMetersPerSecond, 
+            omegaRadiansPerSecond, 
+            pigeon.getHeading()
+        );
         SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(speeds);
         
         frontLeftTarget = moduleStates[0];

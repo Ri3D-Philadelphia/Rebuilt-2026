@@ -13,10 +13,13 @@ public class SwerveDriveConstants {
 
     // gamepad
     public static final double kJoyDriveSpeedFactor = 1.0;
-    public static final double kJoyAngleSpeedFactor = 1.0;
+    public static final double kJoyAngleSpeedFactor = 4.0;
 
     public static final double kDriveDeadband = 0.05;
     public static final double kAngleDeadband = 0.05;
+
+    // imu
+    public static final int kIMUID = 30;
 
     // encoders
     public static final int kFrontLeftEncoderID = 20;
