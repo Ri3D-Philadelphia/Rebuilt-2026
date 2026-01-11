@@ -31,7 +31,7 @@ public class SwerveDriveConstants {
     public static final int kAngleCurrentLimit = 20;
     
     // NOTE: this is set extremely low bc safety
-    public static final double kDriveVoltsPerSpeed = 12.0 / 100.0; // units: V / (m/s)
+    public static final double kDriveVoltsPerSpeed = 12.0 / 10.0; // units: V / (m/s)
     
     public static final double kDriveGearing = 1.0;
     public static final double kDrivePositionConversionFactor = 360 / kDriveGearing;
@@ -47,10 +47,10 @@ public class SwerveDriveConstants {
     public static final int kBackRightDriveID = 15;
     public static final int kBackLeftDriveID = 17;
 
-    public static final boolean kFrontLeftDriveInverted = false;
-    public static final boolean kFrontRightDriveInverted = false;
-    public static final boolean kBackRightDriveInverted = false;
-    public static final boolean kBackLeftDriveInverted = false;
+    public static final boolean kFrontLeftDriveInverted = true;
+    public static final boolean kFrontRightDriveInverted = true;
+    public static final boolean kBackRightDriveInverted = true;
+    public static final boolean kBackLeftDriveInverted = true;
 
     // angle motors
     public static final int kFrontLeftAngleID = 12;
@@ -58,15 +58,15 @@ public class SwerveDriveConstants {
     public static final int kBackRightAngleID = 16;
     public static final int kBackLeftAngleID = 18;
     
-    public static final boolean kFrontLeftAngleInverted = false;
-    public static final boolean kFrontRightAngleInverted = false;
-    public static final boolean kBackRightAngleInverted = false;
-    public static final boolean kBackLeftAngleInverted = false;
+    public static final boolean kFrontLeftAngleInverted = true;
+    public static final boolean kFrontRightAngleInverted = true;
+    public static final boolean kBackRightAngleInverted = true;
+    public static final boolean kBackLeftAngleInverted = true;
     
-    public static final double kFrontLeftAngleOffset = 0.0;
-    public static final double kFrontRightAngleOffset = 0.0;
-    public static final double kBackRightAngleOffset = 0.0;
-    public static final double kBackLeftAngleOffset = 0.0;
+    public static final double kFrontLeftAngleOffset = 0.311; // radians
+    public static final double kFrontRightAngleOffset = -0.570;
+    public static final double kBackRightAngleOffset = 2.095;
+    public static final double kBackLeftAngleOffset = 0.970;
     
     
     
