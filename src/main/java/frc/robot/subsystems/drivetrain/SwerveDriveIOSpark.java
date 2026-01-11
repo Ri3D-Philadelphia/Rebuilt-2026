@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -19,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 
+@Logged
 public class SwerveDriveIOSpark implements SwerveDriveIO {
 
     public static final SwerveDriveConfig config = new SwerveDriveConfig(
@@ -46,10 +48,17 @@ public class SwerveDriveIOSpark implements SwerveDriveIO {
     private CANcoder backLeftEncoder = new CANcoder(SwerveDriveConstants.kBackLeftEncoderID);
 
     // Module states
-    SwerveModuleState frontLeftState;
-    SwerveModuleState frontRightState;
-    SwerveModuleState backRightState;
-    SwerveModuleState backLeftState;
+    SwerveModuleState frontLeftState = new SwerveModuleState();
+    SwerveModuleState frontRightState = new SwerveModuleState();
+    SwerveModuleState backRightState = new SwerveModuleState();
+    SwerveModuleState backLeftState = new SwerveModuleState();
+
+    Voltage frontLeftDriveVolts = Volts.of(0);
+    Voltage frontRightDriveVolts = Volts.of(0);
+    Voltage backRightDriveVolts = Volts.of(0);
+    Voltage backLeftDriveVolts = Volts.of(0);
+
+    String test = "---";
 
     // wpilib kinematics
     SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
@@ -205,6 +214,9 @@ public class SwerveDriveIOSpark implements SwerveDriveIO {
      * Set the motor speeds to match the given input velocities.
      */
     public void driveFieldCentric(double vxMetersPerSecond, double vyMetersPerSecond, double omegaRadiansPerSecond) {
+        
+        test = "Called drive field centric!";
+
         // update module states
         frontLeftState = new SwerveModuleState(
             0, 
@@ -233,10 +245,10 @@ public class SwerveDriveIOSpark implements SwerveDriveIO {
         SwerveModuleState backRightTarget = moduleStates[3];        
         
         // just set drive voltages
-        Voltage frontLeftDriveVolts = Volts.of(frontLeftTarget.speedMetersPerSecond * SwerveDriveConstants.kDriveVoltsPerSpeed);
-        Voltage frontRightDriveVolts = Volts.of(frontRightTarget.speedMetersPerSecond * SwerveDriveConstants.kDriveVoltsPerSpeed);
-        Voltage backRightDriveVolts = Volts.of(backRightTarget.speedMetersPerSecond * SwerveDriveConstants.kDriveVoltsPerSpeed);
-        Voltage backLeftDriveVolts = Volts.of(backLeftTarget.speedMetersPerSecond * SwerveDriveConstants.kDriveVoltsPerSpeed);
+        frontLeftDriveVolts = Volts.of(frontLeftTarget.speedMetersPerSecond * SwerveDriveConstants.kDriveVoltsPerSpeed);
+        frontRightDriveVolts = Volts.of(frontRightTarget.speedMetersPerSecond * SwerveDriveConstants.kDriveVoltsPerSpeed);
+        backRightDriveVolts = Volts.of(backRightTarget.speedMetersPerSecond * SwerveDriveConstants.kDriveVoltsPerSpeed);
+        backLeftDriveVolts = Volts.of(backLeftTarget.speedMetersPerSecond * SwerveDriveConstants.kDriveVoltsPerSpeed);
 
         frontLeftDrive.setVoltage(frontLeftDriveVolts);
         frontRightDrive.setVoltage(frontRightDriveVolts);

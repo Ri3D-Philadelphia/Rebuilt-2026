@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -36,6 +37,7 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
     DataLogManager.start();
+    Epilogue.bind(this);
   }
 
   /**

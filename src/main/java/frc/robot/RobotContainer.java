@@ -17,12 +17,12 @@ import frc.robot.subsystems.shooterHood.ShooterHood;
 @Logged
 public class RobotContainer {
     private SwerveDrive swerveDrive = new SwerveDrive();
-    private FuelIntakePivot fuelIntakePivot = new FuelIntakePivot();
-    private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller();
-    private Indexer indexer = new Indexer();
-    private ShooterHood shooterHood = new ShooterHood();
-    private ShooterFlywheel shooterFlywheel = new ShooterFlywheel();
-    private Climber climber = new Climber();
+    // private FuelIntakePivot fuelIntakePivot = new FuelIntakePivot();
+    // private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller();
+    // private Indexer indexer = new Indexer();
+    // private ShooterHood shooterHood = new ShooterHood();
+    // private ShooterFlywheel shooterFlywheel = new ShooterFlywheel();
+    // private Climber climber = new Climber();
 
     // gamepads
     private CommandXboxController driver = new CommandXboxController(0);
