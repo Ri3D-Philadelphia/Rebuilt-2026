@@ -1,10 +1,18 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import java.util.function.DoubleSupplier;
+
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.subsystems.drivetrain.SwerveDriveConstants;
@@ -38,13 +46,45 @@ public class RobotContainer {
         () -> -MathUtil.applyDeadband(driver.getRightX(), SwerveDriveConstants.kAngleDeadband)
             * SwerveDriveConstants.kJoyAngleSpeedFactor;
 
+
+
+
+
+
+    
+    // Drive motors
+    private SparkMax frontLeftDrive = new SparkMax(SwerveDriveConstants.kFrontLeftDriveID, MotorType.kBrushless);
+    private SparkMax frontRightDrive = new SparkMax(SwerveDriveConstants.kFrontRightDriveID, MotorType.kBrushless);
+    private SparkMax backRightDrive = new SparkMax(SwerveDriveConstants.kBackRightDriveID, MotorType.kBrushless);
+    private SparkMax backLeftDrive = new SparkMax(SwerveDriveConstants.kBackLeftDriveID, MotorType.kBrushless);
+
     public RobotContainer() {
+
+        // Command driveCommand = swerveDrive.driveFieldCentric(
+        //     driverForward.getAsDouble(), 
+        //     driverStrafe.getAsDouble(), 
+        //     driverTurn.getAsDouble()
+        // );
         
-        swerveDrive.setDefaultCommand(swerveDrive.driveFieldCentric(
-            driverForward.getAsDouble(), 
-            driverStrafe.getAsDouble(), 
-            driverTurn.getAsDouble()
-        ));
+        Trigger xButton = driver.x();
+        xButton.whileTrue(
+            swerveDrive.GO(frontLeftDrive)
+        );
+        xButton.whileFalse(
+            swerveDrive.STOP(frontLeftDrive)
+        );
+        // xButton.whileTrue(swerveDrive.driveFieldCentric(
+        //     1, 0, 0
+        // ));
+        // xButton.whileFalse(swerveDrive.driveFieldCentric(
+        //     0, 0, 0
+        // ));
+
+
+
+
+        
+        // swerveDrive.setDefaultCommand();
     }
     
 }

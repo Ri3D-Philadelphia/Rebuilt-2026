@@ -1,5 +1,9 @@
 package frc.robot.subsystems.drivetrain;
 
+import static edu.wpi.first.units.Units.Volts;
+
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -12,6 +16,18 @@ public class SwerveDrive extends SubsystemBase {
     
     public SwerveDrive() {
         this.io = new SwerveDriveIOSpark();
+    }
+
+
+
+
+    // TEST
+    public Command GO(SparkMax mot) {
+        return run(() -> mot.setVoltage(Volts.of(2)));
+    }
+    
+    public Command STOP(SparkMax mot) {
+        return run(() -> mot.setVoltage(Volts.of(0)));
     }
 
     /**
