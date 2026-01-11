@@ -20,7 +20,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class FuelIntakePivotIOSpark implements FuelIntakePivotIO {
 
     public static final FuelIntakePivotConfig config = new FuelIntakePivotConfig(
-        0.1, 
+        0, 
         0, 
         0, 
         0,
