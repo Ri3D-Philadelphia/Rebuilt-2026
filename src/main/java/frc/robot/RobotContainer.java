@@ -11,6 +11,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.climber.Climber;
@@ -35,44 +36,30 @@ public class RobotContainer {
     // gamepads
     private CommandXboxController driver = new CommandXboxController(0);
     private DoubleSupplier driverForward =
-        () -> MathUtil.applyDeadband(driver.getLeftY(), SwerveDriveConstants.kDriveDeadband)
+        () -> -MathUtil.applyDeadband(driver.getLeftY(), SwerveDriveConstants.kDriveDeadband)
          * SwerveDriveConstants.kJoyDriveSpeedFactor;
 
     private DoubleSupplier driverStrafe =
-        () -> MathUtil.applyDeadband(driver.getLeftX(), SwerveDriveConstants.kDriveDeadband)
+        () -> -MathUtil.applyDeadband(driver.getLeftX(), SwerveDriveConstants.kDriveDeadband)
             * SwerveDriveConstants.kJoyDriveSpeedFactor;
 
     private DoubleSupplier driverTurn =
         () -> -MathUtil.applyDeadband(driver.getRightX(), SwerveDriveConstants.kAngleDeadband)
             * SwerveDriveConstants.kJoyAngleSpeedFactor;
 
-
-
-
-
-
-    
-    // Drive motors
-    private SparkMax frontLeftDrive = new SparkMax(SwerveDriveConstants.kFrontLeftDriveID, MotorType.kBrushless);
-    private SparkMax frontRightDrive = new SparkMax(SwerveDriveConstants.kFrontRightDriveID, MotorType.kBrushless);
-    private SparkMax backRightDrive = new SparkMax(SwerveDriveConstants.kBackRightDriveID, MotorType.kBrushless);
-    private SparkMax backLeftDrive = new SparkMax(SwerveDriveConstants.kBackLeftDriveID, MotorType.kBrushless);
-
     public RobotContainer() {
 
-        // Command driveCommand = swerveDrive.driveFieldCentric(
-        //     driverForward.getAsDouble(), 
-        //     driverStrafe.getAsDouble(), 
-        //     driverTurn.getAsDouble()
-        // );
+        // new RunCommand(() -> {
+            
+        // }, swerveDrive).schedule();
         
         Trigger xButton = driver.x();
-        xButton.whileTrue(
-            swerveDrive.GO(frontLeftDrive)
-        );
-        xButton.whileFalse(
-            swerveDrive.STOP(frontLeftDrive)
-        );
+        // xButton.whileTrue(
+        //     swerveDrive.GO()
+        // );
+        // xButton.whileFalse(
+        //     swerveDrive.STOP()
+        // );
         // xButton.whileTrue(swerveDrive.driveFieldCentric(
         //     1, 0, 0
         // ));
@@ -80,11 +67,22 @@ public class RobotContainer {
         //     0, 0, 0
         // ));
 
+        // Trigger lJoy = driver.leftStick();
 
+        xButton.whileTrue(swerveDrive.driveFieldCentric(
+            driverForward, 
+            driverStrafe, 
+            driverTurn
+        ));
+        xButton.whileFalse(swerveDrive.driveFieldCentric(
+            () -> 0, 
+            () -> 0, 
+            () -> 0
+        ));
 
 
         
-        // swerveDrive.setDefaultCommand();
+        // swerveDrive.setDefaultCommand(driveCommand);
     }
     
 }

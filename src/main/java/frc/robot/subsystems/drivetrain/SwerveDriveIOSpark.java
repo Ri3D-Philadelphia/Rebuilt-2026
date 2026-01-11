@@ -4,6 +4,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -12,6 +13,7 @@ import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -24,7 +26,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class SwerveDriveIOSpark implements SwerveDriveIO {
 
     public static final SwerveDriveConfig config = new SwerveDriveConfig(
-        0, 
+        2, 
         0, 
         0
     );
@@ -48,16 +50,33 @@ public class SwerveDriveIOSpark implements SwerveDriveIO {
     private CANcoder backLeftEncoder = new CANcoder(SwerveDriveConstants.kBackLeftEncoderID);
 
     // Module states
-    SwerveModuleState frontLeftState = new SwerveModuleState();
-    SwerveModuleState frontRightState = new SwerveModuleState();
-    SwerveModuleState backRightState = new SwerveModuleState();
-    SwerveModuleState backLeftState = new SwerveModuleState();
+    private SwerveModuleState frontLeftState = new SwerveModuleState();
+    private SwerveModuleState frontRightState = new SwerveModuleState();
+    private SwerveModuleState backRightState = new SwerveModuleState();
+    private SwerveModuleState backLeftState = new SwerveModuleState();
 
-    Voltage frontLeftDriveVolts = Volts.of(0);
-    Voltage frontRightDriveVolts = Volts.of(0);
-    Voltage backRightDriveVolts = Volts.of(0);
-    Voltage backLeftDriveVolts = Volts.of(0);
+    private Voltage frontLeftDriveVolts = Volts.of(0);
+    private Voltage frontRightDriveVolts = Volts.of(0);
+    private Voltage backRightDriveVolts = Volts.of(0);
+    private Voltage backLeftDriveVolts = Volts.of(0);
 
+    // PID
+    private PIDController frontLeftAngleController;
+    private PIDController frontRightAngleController;
+    private PIDController backRightAngleController;
+    private PIDController backLeftAngleController;
+
+    private Voltage frontLeftAngleVolts = Volts.of(0);
+    private Voltage frontRightAngleVolts = Volts.of(0);
+    private Voltage backRightAngleVolts = Volts.of(0);
+    private Voltage backLeftAngleVolts = Volts.of(0);
+
+    private SwerveModuleState frontLeftTarget;
+    private SwerveModuleState frontRightTarget;
+    private SwerveModuleState backRightTarget;
+    private SwerveModuleState backLeftTarget;
+
+    // Debug
     String test = "---";
 
     // wpilib kinematics
@@ -70,6 +89,7 @@ public class SwerveDriveIOSpark implements SwerveDriveIO {
 
     public SwerveDriveIOSpark() {
         configureMotors();
+        configureControllers();
         frontLeftState = new SwerveModuleState(
             0, 
             new Rotation2d(getFrontLeftAngle())
@@ -210,12 +230,37 @@ public class SwerveDriveIOSpark implements SwerveDriveIO {
 
     }
 
+    private void configureControllers() {
+        frontLeftAngleController = new PIDController(config.kP(), config.kI(), config.kD());
+        frontRightAngleController = new PIDController(config.kP(), config.kI(), config.kD());
+        backRightAngleController = new PIDController(config.kP(), config.kI(), config.kD());
+        backLeftAngleController = new PIDController(config.kP(), config.kI(), config.kD());
+    }
+
+    public void powerFrontLeftDrive(Voltage volts) {
+        test = volts + " volts";
+        frontLeftDrive.setVoltage(volts);
+    }
+
+    /**
+     * Normalize an angle in radians to between [-pi, pi).
+     */
+    public double normalizeAngle(double radians) {
+        while (radians >= Math.PI) {
+            radians -= 2 * Math.PI;
+        }
+        while (radians < -Math.PI) {
+            radians += 2 * Math.PI;
+        }
+        return radians;
+    }
+
     /**
      * Set the motor speeds to match the given input velocities.
      */
     public void driveFieldCentric(double vxMetersPerSecond, double vyMetersPerSecond, double omegaRadiansPerSecond) {
         
-        test = "Called drive field centric!";
+        test = vxMetersPerSecond + "," + vyMetersPerSecond + "," + omegaRadiansPerSecond + " drive!";
 
         // update module states
         frontLeftState = new SwerveModuleState(
@@ -239,12 +284,19 @@ public class SwerveDriveIOSpark implements SwerveDriveIO {
         ChassisSpeeds speeds = new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
         SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(speeds);
         
-        SwerveModuleState frontLeftTarget = moduleStates[0];
-        SwerveModuleState frontRightTarget = moduleStates[1];
-        SwerveModuleState backLeftTarget = moduleStates[2];
-        SwerveModuleState backRightTarget = moduleStates[3];        
+        frontLeftTarget = moduleStates[0];
+        frontLeftTarget.optimize(frontLeftState.angle);
+
+        frontRightTarget = moduleStates[1];
+        frontRightTarget.optimize(frontRightState.angle);
+
+        backLeftTarget = moduleStates[2];
+        backLeftTarget.optimize(backLeftState.angle);
+
+        backRightTarget = moduleStates[3];
+        backRightTarget.optimize(backRightState.angle);
         
-        // just set drive voltages
+        // drive voltages
         frontLeftDriveVolts = Volts.of(frontLeftTarget.speedMetersPerSecond * SwerveDriveConstants.kDriveVoltsPerSpeed);
         frontRightDriveVolts = Volts.of(frontRightTarget.speedMetersPerSecond * SwerveDriveConstants.kDriveVoltsPerSpeed);
         backRightDriveVolts = Volts.of(backRightTarget.speedMetersPerSecond * SwerveDriveConstants.kDriveVoltsPerSpeed);
@@ -254,34 +306,75 @@ public class SwerveDriveIOSpark implements SwerveDriveIO {
         frontRightDrive.setVoltage(frontRightDriveVolts);
         backRightDrive.setVoltage(backRightDriveVolts);
         backLeftDrive.setVoltage(backLeftDriveVolts);
+
+        // angle control
+        frontLeftAngleVolts = Volts.of(config.kP() * normalizeAngle(frontLeftTarget.angle.getRadians() - frontLeftState.angle.getRadians()));
+        frontRightAngleVolts = Volts.of(config.kP() * normalizeAngle(frontRightTarget.angle.getRadians() - frontRightState.angle.getRadians()));
+        backRightAngleVolts = Volts.of(config.kP() * normalizeAngle(backRightTarget.angle.getRadians() - backRightState.angle.getRadians()));
+        backLeftAngleVolts = Volts.of(config.kP() * normalizeAngle(backLeftTarget.angle.getRadians() - backLeftState.angle.getRadians()));
+
+        // frontLeftAngleVolts = Volts.of(frontLeftAngleController.calculate(
+        //     -normalizeAngle(frontLeftTarget.angle.getRadians() - frontLeftState.angle.getRadians()), 
+        //     0
+        // ));
+        // frontRightAngleVolts = Volts.of(frontRightAngleController.calculate(
+        //     -normalizeAngle(frontRightTarget.angle.getRadians() - frontRightState.angle.getRadians()), 
+        //     0
+        // ));
+        // backRightAngleVolts = Volts.of(backRightAngleController.calculate(
+        //     -normalizeAngle(backRightTarget.angle.getRadians() - backRightState.angle.getRadians()), 
+        //     0
+        // ));
+        // backLeftAngleVolts = Volts.of(backLeftAngleController.calculate(
+        //     -normalizeAngle(backLeftTarget.angle.getRadians() - backLeftState.angle.getRadians()), 
+        //     0
+        // ));
+        
+        frontLeftAngle.setVoltage(frontLeftAngleVolts);
+        frontRightAngle.setVoltage(frontRightAngleVolts);
+        backRightAngle.setVoltage(backRightAngleVolts);
+        backLeftAngle.setVoltage(backLeftAngleVolts);
+        
     }
 
     /**
      * Return the front left module's angle.
      */
     public Angle getFrontLeftAngle() {
-        return frontLeftEncoder.getAbsolutePosition().getValue();
+        Angle rawAngle = frontLeftEncoder.getAbsolutePosition().getValue();
+        return Radians.of(normalizeAngle(
+            rawAngle.in(Radians) - SwerveDriveConstants.kFrontLeftAngleOffset
+        ));
     }
     
     /**
      * Return the front right module's angle.
      */
     public Angle getFrontRightAngle() {
-        return frontRightEncoder.getAbsolutePosition().getValue();
+        Angle rawAngle = frontRightEncoder.getAbsolutePosition().getValue();
+        return Radians.of(normalizeAngle(
+            rawAngle.in(Radians) - SwerveDriveConstants.kFrontRightAngleOffset
+        ));
     }
     
     /**
      * Return the back right module's angle.
      */
     public Angle getBackRightAngle() {
-        return backRightEncoder.getAbsolutePosition().getValue();
+        Angle rawAngle = backRightEncoder.getAbsolutePosition().getValue();
+        return Radians.of(normalizeAngle(
+            rawAngle.in(Radians) - SwerveDriveConstants.kBackRightAngleOffset
+        ));
     }
     
     /**
      * Return the back left module's angle.
      */
     public Angle getBackLeftAngle() {
-        return backLeftEncoder.getAbsolutePosition().getValue();
+        Angle rawAngle = backLeftEncoder.getAbsolutePosition().getValue();
+        return Radians.of(normalizeAngle(
+            rawAngle.in(Radians) - SwerveDriveConstants.kBackLeftAngleOffset
+        ));
     }
     
 }
