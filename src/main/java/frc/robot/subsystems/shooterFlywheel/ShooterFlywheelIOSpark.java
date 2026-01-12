@@ -2,8 +2,11 @@ package frc.robot.subsystems.shooterFlywheel;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.RelativeEncoder;
@@ -14,15 +17,37 @@ import edu.wpi.first.math.controller.PIDController;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.subsystems.fuelIntakePivot.FuelIntakePivotConstants;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.SmartMotorControllerOptions;
 
 public class ShooterFlywheelIOSpark implements ShooterFlywheelIO {
-    private final SparkMax flywheelMotor = new SparkMax(ShooterFlywheelConstants.kLeaderId, MotorType.kBrushless);
+    private final SparkFlex flywheelMotor = new SparkFlex(ShooterFlywheelConstants.kLeaderId, MotorType.kBrushless);
+    private final SparkClosedLoopController velocityController;
     private final RelativeEncoder encoder;
     
     public ShooterFlywheelIOSpark() {
         encoder = flywheelMotor.getEncoder();
+        velocityController = flywheelMotor.getClosedLoopController();
+        velocityController.setSetpoint(100, ControlType.kVelocity);
+        configureMotors();
+    }
+
+    private void configureMotors() {
+        flywheelMotor.configure(
+            new SparkFlexConfig()
+                .inverted(ShooterFlywheelConstants.kInverted)
+                .voltageCompensation(ShooterFlywheelConstants.kNominalVoltage.in(Volts))
+                .smartCurrentLimit(ShooterFlywheelConstants.kCurrentLimit)
+                .apply(
+                    new EncoderConfig()
+                        .velocityConversionFactor(
+                            ShooterFlywheelConstants.kFlywheelVelocityConversionFactor)
+                        .positionConversionFactor(
+                            ShooterFlywheelConstants.kFlywheelPositionConversionFactor)),
+            ResetMode.kResetSafeParameters,
+            PersistMode.kPersistParameters
+        );
     }
 
     @Override
@@ -35,6 +60,12 @@ public class ShooterFlywheelIOSpark implements ShooterFlywheelIO {
     @Override
     public void setVoltage(double volts) {
         flywheelMotor.setVoltage(volts);
+    }
+
+    @Override
+    public void setVelocityRPM(double rpm) {
+        // This tells the SparkFlex to use its internal PID to reach this velocity
+        velocityController.setReference(rpm, ControlType.kVelocity);
     }
 
     @Override

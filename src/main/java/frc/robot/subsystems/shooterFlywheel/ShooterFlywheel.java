@@ -6,41 +6,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // removed CTRE ControlMode import to avoid collision with YAMS
 // import com.ctre.phoenix.motorcontrol.ControlMode;
 
-// Use REV CANSparkMax classes
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-
-// ...existing code...
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.system.plant.DCMotor;
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Pounds;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
-import frc.robot.Constants;
-import frc.robot.subsystems.indexer.IndexerIOSpark;
-// removed swervelib import — not present in your dependencies
-// import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
-import yams.gearing.GearBox;
-import yams.gearing.MechanismGearing;
-import yams.mechanisms.config.FlyWheelConfig;
-import yams.mechanisms.velocity.FlyWheel;
-import yams.motorcontrollers.SmartMotorController;
-import yams.motorcontrollers.SmartMotorControllerConfig;
-import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
-import yams.motorcontrollers.local.SparkWrapper;
 
 
 
@@ -51,54 +20,110 @@ public class ShooterFlywheel extends SubsystemBase {
     // removed self-referential field
     // private ShooterFlywheel m_shooterFlywheel;
 
-    private final  PIDController pid = new PIDController(
-        ShooterFlywheelConstants.kP, 
-        ShooterFlywheelConstants.kI, 
-        ShooterFlywheelConstants.kD);
-
     private double targetRPM = 0.0;
 
 
-    public ShooterFlywheel(ShooterFlywheelIO io){
+    public ShooterFlywheel(){
        this.io = new ShooterFlywheelIOSpark();
-        pid.setTolerance(ShooterFlywheelConstants.kRpmTolerance);
     }
 
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
+        // // This method will be called once per scheduler run
+        // io.updateInputs(inputs);
+        // if (targetRPM > 0.0){
+        //     double volts = pid.calculate(inputs.velocityRPM, targetRPM);
+        //     io.setVoltage(volts);
+        // }
+
+        // Update inputs from hardware
         io.updateInputs(inputs);
-        if (targetRPM > 0.0){
-            double volts = pid.calculate(inputs.velocityRPM, targetRPM);
-            io.setVoltage(volts);
-        }
+        
+        // Log data to SmartDashboard for debugging
+        SmartDashboard.putNumber("Shooter/CurrentRPM", inputs.velocityRPM);
+        SmartDashboard.putNumber("Shooter/TargetRPM", targetRPM);
+        SmartDashboard.putNumber("Shooter/Voltage", inputs.appliedVoltage);
+        SmartDashboard.putNumber("Shooter/Current", inputs.currentAmps);
+        SmartDashboard.putBoolean("Shooter/AtSpeed", atSpeed());
+        SmartDashboard.putNumber("Shooter/RPMError", Math.abs(targetRPM - inputs.velocityRPM));
     }
 
-    public void setRPM(double rpm){
+
+    public void setVelocityRPM(double rpm) {
         targetRPM = rpm;
+        io.setVelocityRPM(rpm);
     }
 
     public void stop(){
         targetRPM = 0.0;
         io.stop();
-        pid.reset();
     }
 
-    public boolean atSPeed(){
-        return pid.atSetpoint();
+    public boolean atSpeed(){
+        if (targetRPM == 0.0){
+            return false;
+        }
+        double error = Math.abs(targetRPM - inputs.velocityRPM);
+        return error < ShooterFlywheelConstants.kRpmTolerance;
     }
 
     public double getRPM(){
         return inputs.velocityRPM;
     }
 
-
-    public Command spinUpCommand(double rpm){
-        return Commands.run(() -> setRPM(rpm), this);
+    public double getTargetRPM(){
+        return targetRPM;
     }
 
-    public Command stopCommand(){
-        return Commands.runOnce(this::stop, this);
+
+    // ==================== COMMANDS ====================
+
+    /**
+     * Command to spin the flywheel to a specific RPM.
+     * The command runs continuously - use .withTimeout() or button release to stop.
+     */
+    public Command spinToRPM(double rpm) {
+        return Commands.run(
+            () -> setVelocityRPM(rpm), 
+            this
+        ).withName("SpinToRPM_" + rpm);
     }
+
+    /**
+     * Command to spin up to default shooting speed.
+     */
+    public Command spinToDefault() {
+        return spinToRPM(ShooterFlywheelConstants.kDefaultShootRPM)
+            .withName("SpinToDefault");
+    }
+
+    /**
+     * Command to stop the flywheel.
+     */
+    public Command stopCommand() {
+        return Commands.runOnce(this::stop, this)
+            .withName("StopShooter");
+    }
+
+    /**
+     * Command that spins up and waits until the flywheel reaches target speed.
+     * Useful for autonomous or sequenced commands.
+     */
+    public Command spinUpAndWait(double rpm) {
+        return Commands.sequence(
+            Commands.runOnce(() -> setVelocityRPM(rpm)),
+            Commands.waitUntil(this::atSpeed)
+        ).withTimeout(3.0)  // 3 second timeout
+         .withName("SpinUpAndWait_" + rpm);
+    }
+
+    /**
+     * Command to spin up to default speed and wait.
+     */
+    public Command spinUpDefaultAndWait() {
+        return spinUpAndWait(ShooterFlywheelConstants.kDefaultShootRPM)
+            .withName("SpinUpDefaultAndWait");
+    }
+
 }
