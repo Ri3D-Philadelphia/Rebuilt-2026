@@ -25,6 +25,13 @@ import frc.robot.util.TunableDouble;
 @Logged
 public class FuelIntakePivot extends SubsystemBase {
 
+    public enum PivotState {
+        EXTENDED,
+        RETRACTED
+    }
+    
+    private PivotState desiredState = PivotState.RETRACTED;
+
     private FuelIntakePivotIO io;
     private FuelIntakePivotInputs inputs;
 
@@ -50,6 +57,40 @@ public class FuelIntakePivot extends SubsystemBase {
             FuelIntakePivotConstants.kControllerTolerance.in(Degrees));
 
         io.resetEncoder(Degrees.of(0));
+    }
+
+    /**
+     * Update this subsystem's pivot state to Extended.
+     */
+    public void setExtended() {
+        desiredState = PivotState.EXTENDED;
+    }
+
+    /**
+     * Update this subsystem's pivot state to Retracted.
+     */
+    public void setRetracted() {
+        desiredState = PivotState.RETRACTED;
+    }
+    
+    /**
+     * Get whether the pivot is extended.
+     */
+    public boolean isExtended() {
+        return desiredState == PivotState.EXTENDED;
+    }
+
+    /**
+     * Set the pivot voltage based on state.
+     */
+    public Command holdPosition() {
+        return run(() -> {
+            if (desiredState == PivotState.EXTENDED) {
+                runToAngle(config.downAngle());
+            } else {
+                runToAngle(config.upAngle());
+            }
+        });
     }
 
     /**

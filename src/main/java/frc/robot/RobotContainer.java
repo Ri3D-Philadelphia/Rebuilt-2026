@@ -11,6 +11,8 @@ import frc.robot.subsystems.drivetrain.Pigeon2Gyro;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
@@ -59,6 +61,8 @@ public class RobotContainer {
 
         configureBindings1();
         configureBindings2();
+        
+        // fuelIntakePivot.home().schedule(); // TODO: Test this
 
         m_shooterFlywheel.setDefaultCommand(m_shooterFlywheel.set(0));
 
@@ -131,14 +135,56 @@ public class RobotContainer {
     }
 
     private void configureBindings2() {
+        // Hold position commands (subsystems continuously run control or set motor voltages)
+        fuelIntakePivot.setDefaultCommand(
+            fuelIntakePivot.holdPosition()
+        );
+
+        fuelIntakeRoller.setDefaultCommand(
+            fuelIntakeRoller.holdRoller()
+        );
+
+        // Intake commands
+        Trigger leftBumper = driver.leftBumper();
+        Trigger leftTrigger = driver.leftTrigger();
+
+        leftTrigger.onTrue(
+            Commands.runOnce(() -> {
+                if (fuelIntakePivot.isExtended()
+                    && fuelIntakeRoller.isRollingIn()) {
+
+                    // Toggle OFF
+                    fuelIntakeRoller.setStopped();
+                    fuelIntakePivot.setRetracted();
+
+                } else {
+                    // Turn ON / Change direction
+                    fuelIntakePivot.setExtended();
+                    fuelIntakeRoller.setRollIn();
+                }
+            })
+        );
+
+        leftBumper.onTrue(
+            Commands.runOnce(() -> {
+                if (fuelIntakePivot.isExtended()
+                    && fuelIntakeRoller.isRollingOut()) {
+
+                    // Toggle OFF
+                    fuelIntakeRoller.setStopped();
+                    fuelIntakePivot.setRetracted();
+
+                } else {
+                    // Turn ON / Change direction
+                    fuelIntakePivot.setExtended();
+                    fuelIntakeRoller.setRollOut();
+                }
+            })
+        );
 
 
-        
+
     }
-
-
-   
-
     
 }
 
