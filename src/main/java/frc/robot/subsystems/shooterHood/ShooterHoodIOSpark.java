@@ -30,7 +30,7 @@ public class ShooterHoodIOSpark implements ShooterHoodIO {
         hoodMotor.configure(
             new SparkMaxConfig()
                 .inverted(ShooterHoodConstants.kInverted)
-                .voltageCompensation(ShooterHoodConstants.kNominalVoltage)
+                .voltageCompensation(ShooterHoodConstants.kNominalVoltage.in(Volts))
                 .smartCurrentLimit(ShooterHoodConstants.kCurrentLimit),
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters

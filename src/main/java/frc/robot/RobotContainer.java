@@ -158,7 +158,7 @@ public class RobotContainer {
         driver.povUp().onTrue(
             Commands.parallel(
                 hood.adjustAngleCommand(5.0),  // Increase by 5 degrees
-                shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM)
+                Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
             ).withName("IncreaseShotDistance")
         );
         
@@ -166,7 +166,7 @@ public class RobotContainer {
         driver.povDown().onTrue(
             Commands.parallel(
                 hood.adjustAngleCommand(-5.0),  // Decrease by 5 degrees
-                shooter.setVelocityRPM(ShooterFlywheelConstants.kCloseShootRPM)
+                Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kCloseShootRPM), shooter)
             ).withName("DecreaseShotDistance")
         );
         
@@ -174,7 +174,7 @@ public class RobotContainer {
         driver.povLeft().onTrue(
             Commands.parallel(
                 hood.setAngleCommand(ShooterHoodConstants.kCloseAngleDeg),
-                shooter.setVelocityRPM(ShooterFlywheelConstants.kCloseShootRPM)
+                Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
             ).withName("CloseShot")
         );
         
@@ -182,7 +182,7 @@ public class RobotContainer {
         driver.povRight().onTrue(
             Commands.parallel(
                 hood.setAngleCommand(ShooterHoodConstants.kFarAngleDeg),
-                shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM)
+                Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
             ).withName("FarShot")
         );
 
