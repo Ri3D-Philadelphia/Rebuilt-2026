@@ -29,7 +29,7 @@ import frc.robot.subsystems.shooterHood.ShooterHood;
 public class RobotContainer {
     private SwerveDrive swerveDrive = new SwerveDrive();
     private FuelIntakePivot fuelIntakePivot = new FuelIntakePivot();
-    private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller();
+    private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller(fuelIntakePivot);
     private Indexer indexer = new Indexer();
     private ShooterHood shooterHood = new ShooterHood();
     private final ShooterFlywheel m_shooterFlywheel = new ShooterFlywheel();
@@ -144,6 +144,21 @@ public class RobotContainer {
             fuelIntakeRoller.holdRoller()
         );
 
+
+
+
+
+
+        // TODO: Testing intake homing
+        // TODO: TEMPORARY BINDING, REMOVE LATER
+        Trigger backButton = driver.back();
+        backButton.onTrue(fuelIntakePivot.home());
+
+
+
+
+
+
         // Intake commands
         Trigger leftBumper = driver.leftBumper();
         Trigger leftTrigger = driver.leftTrigger();
@@ -181,6 +196,16 @@ public class RobotContainer {
                 }
             })
         );
+
+
+
+
+        // TODO: Testing indexer 
+        // TODO: TEMPORARY BINDING, REMOVE LATER
+        Trigger startButton = driver.start();
+        startButton.onTrue(indexer.runIndexerOnce());
+
+
 
 
 
