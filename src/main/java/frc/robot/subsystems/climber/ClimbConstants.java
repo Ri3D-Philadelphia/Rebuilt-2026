@@ -11,7 +11,7 @@ import edu.wpi.first.units.measure.Voltage;
 
 @Logged
 public class ClimbConstants {
-    public static final int kClimbMotorId = 7;
+    public static final int kClimbMotorId = 7;  
     public static final boolean kInverted = false;
     public static final int kCurrentLimit = 60;
 

@@ -15,17 +15,18 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 @Logged
 public class ClimbIOSpark implements ClimbIO {
 
     public static final ClimbConfig config = new ClimbConfig(
-        0.1, 
+        0.01,
         0, 
         0, 
         0,
         Degrees.of(0), 
-        Degrees.of(0)
+        Degrees.of(90)
     );
 
     private SparkMax climbMotor = new SparkMax(
@@ -71,6 +72,7 @@ public class ClimbIOSpark implements ClimbIO {
         inputs.climbAngle = Degrees.of(climbMotor.getEncoder().getPosition());
         inputs.climbVelocity = DegreesPerSecond.of(climbMotor.getEncoder().getVelocity());
         inputs.climbCurrent = Amps.of(climbMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Climb Encoder",  (climbMotor.getEncoder().getPosition()));
     }
 
     /**

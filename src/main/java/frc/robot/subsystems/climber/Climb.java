@@ -14,7 +14,9 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.TunableAngle;
 import frc.robot.util.TunableDouble;
@@ -50,6 +52,10 @@ public class Climb extends SubsystemBase {
         io.resetEncoder(Degrees.of(0));
     }
 
+    public Command resetEncoder() {
+        return runOnce(() -> io.resetEncoder(Degrees.of(0)));
+    }
+
     /**
      * Tune the climb motor using down angle as setpoint.
      */
@@ -72,9 +78,12 @@ public class Climb extends SubsystemBase {
      */
     public void runToAngle(Angle desiredAngle) {
         Voltage desiredVoltage = Volts.of(
-            feedForward.calculate(desiredAngle.in(Radians), 0) + 
+            feedForward.calculate(desiredAngle.in(Degrees), 0) + 
             climbController.calculate(inputs.climbAngle.in(Degrees), desiredAngle.in(Degrees))
         );
+
+        SmartDashboard.putNumber("Target Climb Angle", desiredAngle.in(Degrees));
+        SmartDashboard.putNumber("Curr Climb Angle", inputs.climbAngle.in(Degrees));
 
         io.setClimbVoltage(desiredVoltage);
     }
@@ -91,6 +100,9 @@ public class Climb extends SubsystemBase {
      * Return a command to move the climb down.
      */
     public Command climbDown() {
+
+        SmartDashboard.putBoolean("DownCalled", true);
+
         return runToAngle(() -> config.downAngle());
     }
     
@@ -98,7 +110,10 @@ public class Climb extends SubsystemBase {
      * Return a command to move the climb up.
      */
     public Command climbUp() {
-        return runToAngle(() -> config.upAngle());
+        SmartDashboard.putBoolean("UpCalled", true);
+
+        return Commands.run(() -> runToAngle(config.upAngle()), this);
+
     }
 
     /**
@@ -142,6 +157,27 @@ public class Climb extends SubsystemBase {
      */
     public boolean isHomed() {
         return isHomed;
+    }
+
+    /**
+     *set voltage to 1
+     */
+    public Command setVoltage1() {
+        return run(() -> io.setClimbVoltage(Volts.of(1)));
+    }
+
+    /**
+     *set voltage to -1
+     */
+    public Command setVoltageminus1() {
+        return run(() -> io.setClimbVoltage(Volts.of(-1)));
+    }
+
+    /**
+     * Get whether the climb is homed.
+     */
+    public Command stop() {
+        return run(() -> io.setClimbVoltage(Volts.of(0)));
     }
 
 
