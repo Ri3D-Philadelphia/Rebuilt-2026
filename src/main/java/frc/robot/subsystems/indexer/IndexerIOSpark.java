@@ -6,26 +6,26 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
 
 @Logged
 public class IndexerIOSpark implements IndexerIO {
-    private SparkMax indexerMotor = new SparkMax(IndexerConstants.kIndexerMotorId, MotorType.kBrushless);
+    private SparkFlex indexerMotor = new SparkFlex(IndexerConstants.kIndexerMotorId, MotorType.kBrushless);
 
     public IndexerIOSpark() {
         configureMotors();
     }
 
     /**
-     * Configures the SparkMax.
+     * Configures the SparkFlex.
      */
     private void configureMotors() {
         indexerMotor.configure(
-            new SparkMaxConfig()
+            new SparkFlexConfig()
                 .inverted(IndexerConstants.kInverted)
                 .voltageCompensation(IndexerConstants.kNominalVoltage.in(Volts))
                 .smartCurrentLimit(IndexerConstants.kCurrentLimit),
