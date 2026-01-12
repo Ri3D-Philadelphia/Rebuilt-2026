@@ -57,13 +57,14 @@ public class RobotContainer {
 
      public RobotContainer() {
 
-        configureBindings();
+        configureBindings1();
+        configureBindings2();
 
         m_shooterFlywheel.setDefaultCommand(m_shooterFlywheel.set(0));
 
      }
 
-    private void configureBindings() {
+    private void configureBindings1() {
         // Configure your button bindings here
          // Schedule `setVelocity` when the Xbox controller's B button is pressed,
         // cancelling on release.
@@ -127,7 +128,13 @@ public class RobotContainer {
         // }).schedule();
    
       
-    }      
+    }
+
+    private void configureBindings2() {
+
+
+        
+    }
 
 
    
