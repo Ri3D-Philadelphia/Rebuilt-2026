@@ -4,11 +4,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.drivetrain.Pigeon2Gyro;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -27,7 +31,7 @@ public class Robot extends TimedRobot {
 
   /**
    * This function is run when the robot is first started up and should be used for any
-   * initialization code.
+   * initialization code.  
    */
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -36,6 +40,9 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
     DataLogManager.start();
+
+    // Shuffleboard.getTab("Pigeon").add(gyro);
+    Epilogue.bind(this);
   }
 
   /**
@@ -46,7 +53,22 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+  
+    try {
+    Pigeon2Gyro pigeon = m_robotContainer.getPigeon();
+    if (pigeon != null) {
+      double yawDeg = pigeon.getHeading().getDegrees();
+      SmartDashboard.putNumber("PigeonYawDeg", yawDeg);
+    } else {
+      SmartDashboard.putString("PigeonYawDeg", "pigeon null");
+    }
+  } catch (Throwable t) {
+    SmartDashboard.putString("PigeonYawDeg", "err: " + t.getMessage());
+    t.printStackTrace();
+  }
+  }
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
