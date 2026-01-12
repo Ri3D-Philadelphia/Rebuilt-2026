@@ -1,4 +1,4 @@
-package frc.robot.subsystems.fuelIntakePivot;
+package frc.robot.subsystems.shooterFlywheel;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Angle;

@@ -6,41 +6,39 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkBase.ControlType;
+
+import edu.wpi.first.math.controller.PIDController;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
+import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig.SmartMotorControllerOptions;
 
 public class ShooterFlywheelIOSpark implements ShooterFlywheelIO {
-    private final CANSparkMax motor;
+    private final SparkMax flywheelMotor = new SparkMax(ShooterFlywheelConstants.kLeaderId, MotorType.kBrushless);
     private final RelativeEncoder encoder;
-    private final SparkPIDController pid;
-
-    public ShooterFlywheelIOSpark(int canId) {
-        motor = new CANSparkMax(canId, MotorType.kBrushless);
-        encoder = motor.getEncoder();
-        pid = motor.getPIDController();
+    
+    public ShooterFlywheelIOSpark() {
+        encoder = flywheelMotor.getEncoder();
     }
 
     @Override
     public void updateInputs(ShooterFlywheelInputs inputs) {
         inputs.velocityRPM = encoder.getVelocity();
-        inputs.appliedVoltage = motor.getAppliedOutput() * motor.getBusVoltage();
-        inputs.currentAmps = motor.getOutputCurrent();
-    }
-
-    @Override
-    public void setVelocityRPM(double rpm) {
-        pid.setReference(rpm, ControlType.kVelocity);
+        inputs.appliedVoltage = flywheelMotor.getAppliedOutput() * flywheelMotor.getBusVoltage();
+        inputs.currentAmps = flywheelMotor.getOutputCurrent();
     }
 
     @Override
     public void setVoltage(double volts) {
-        motor.setVoltage(volts);
+        flywheelMotor.setVoltage(volts);
     }
 
     @Override
     public void stop() {
-        motor.stopMotor();
+        flywheelMotor.stopMotor();
     }
 }
