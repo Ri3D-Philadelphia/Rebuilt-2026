@@ -6,7 +6,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class ShooterHoodConstants {
     
     // Motor configuration
-    public static final int kHoodMotorId = 19;
+    public static final int kHoodMotorId = 5;
     public static final boolean kInverted = false;
     public static final int kCurrentLimit = 20;  // Hood doesn't need much current
 

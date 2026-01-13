@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.epilogue.Logged;
@@ -52,7 +53,13 @@ public class ClimbIOSpark implements ClimbIO {
                         .velocityConversionFactor(
                             ClimbConstants.kClimbVelocityConversionFactor)
                         .positionConversionFactor(
-                            ClimbConstants.kClimbPositionConversionFactor)),
+                            ClimbConstants.kClimbPositionConversionFactor))
+                .apply(
+                    new SoftLimitConfig()
+                        .forwardSoftLimit(ClimbConstants.kMaxRotations)
+                        .forwardSoftLimitEnabled(true)
+                        .reverseSoftLimit(ClimbConstants.kMinRotations)
+                        .reverseSoftLimitEnabled(true)),
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters
         );

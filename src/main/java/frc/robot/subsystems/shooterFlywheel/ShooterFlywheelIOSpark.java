@@ -29,26 +29,41 @@ public class ShooterFlywheelIOSpark implements ShooterFlywheelIO {
     public ShooterFlywheelIOSpark() {
         encoder = flywheelMotor.getEncoder();
         velocityController = flywheelMotor.getClosedLoopController();
-        velocityController.setSetpoint(100, ControlType.kVelocity);
+        // velocityController.setSetpoint(100, ControlType.kVelocity); // this doesnt work
         configureMotors();
     }
 
     private void configureMotors() {
-        flywheelMotor.configure(
-            new SparkFlexConfig()
-                .inverted(ShooterFlywheelConstants.kInverted)
-                .voltageCompensation(ShooterFlywheelConstants.kNominalVoltage.in(Volts))
-                .smartCurrentLimit(ShooterFlywheelConstants.kCurrentLimit)
-                .apply(
-                    new EncoderConfig()
-                        .velocityConversionFactor(
-                            ShooterFlywheelConstants.kFlywheelVelocityConversionFactor)
-                        .positionConversionFactor(
-                            ShooterFlywheelConstants.kFlywheelPositionConversionFactor)),
-            ResetMode.kResetSafeParameters,
-            PersistMode.kPersistParameters
-        );
-    }
+    SparkFlexConfig config = new SparkFlexConfig();
+    
+    config
+        .inverted(ShooterFlywheelConstants.kInverted)
+        .voltageCompensation(ShooterFlywheelConstants.kNominalVoltage.in(Volts))
+        .smartCurrentLimit(ShooterFlywheelConstants.kCurrentLimit);
+    
+    // Configure PID
+    config.closedLoop
+        .p(ShooterFlywheelConstants.kP)
+        .i(ShooterFlywheelConstants.kI)
+        .d(ShooterFlywheelConstants.kD)
+        .outputRange(-1, 1);
+    
+    // Configure feedforward
+    config.closedLoop.feedForward
+        .kV(ShooterFlywheelConstants.kV);
+    
+    // Configure encoder
+    config.encoder
+        .velocityConversionFactor(ShooterFlywheelConstants.kFlywheelVelocityConversionFactor)
+        .positionConversionFactor(ShooterFlywheelConstants.kFlywheelPositionConversionFactor);
+    
+    // Apply the configuration
+    flywheelMotor.configure(
+        config,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters
+    );
+}
 
     @Override
     public void updateInputs(ShooterFlywheelInputs inputs) {

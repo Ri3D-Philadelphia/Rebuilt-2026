@@ -5,7 +5,7 @@ import edu.wpi.first.units.measure.Voltage;
 
 public class ShooterFlywheelConstants {
     // Motor configuration
-    public static final int kLeaderId = 12;
+    public static final int kLeaderId = 6;
     public static final boolean kInverted = false;
     public static final int kCurrentLimit = 60;  // NEO Vortex can handle more current
 

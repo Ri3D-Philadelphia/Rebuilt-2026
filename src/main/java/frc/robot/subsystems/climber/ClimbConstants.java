@@ -22,6 +22,10 @@ public class ClimbConstants {
     // mechanical
     public static final double kClimbGearing = 9.0; // TODO: ASK MECH!!!
 
+    // soft limits
+    public static final double kMinRotations = 0.0;
+    public static final double kMaxRotations = 4500.0;
+
     // pid
     public static final Angle kControllerTolerance = Degrees.of(1);
 

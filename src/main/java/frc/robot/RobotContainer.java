@@ -143,14 +143,6 @@ public class RobotContainer {
             ).withName("Shoot")
         );
         
-        // Right Trigger → (FREE - Available for future use)
-        // Example: Variable speed shooting or amp scoring
-        driver.rightTrigger().whileTrue(
-            Commands.parallel(
-                shooter.spinToRPM(ShooterFlywheelConstants.kAmpShootRPM),
-                hood.setAngleCommand(ShooterHoodConstants.kAmpAngleDeg)
-            ).withName("AmpScore")
-        );
 
         // ==================== HOOD ANGLE ADJUSTMENT ====================
         

@@ -21,6 +21,8 @@ public class ShooterHoodIOSpark implements ShooterHoodIO {
         hoodMotor = new SparkMax(ShooterHoodConstants.kHoodMotorId, MotorType.kBrushless);
         encoder = hoodMotor.getEncoder();
         configureMotors();
+
+         encoder.setPosition(0);
     }
 
     /**
