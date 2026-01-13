@@ -12,8 +12,8 @@ public class FuelIntakeRollerConstants {
     public static final int kRollerMotorId = 3;
 
     // moc outputs
-    public static final Voltage kRollerInVoltage = Volts.of(6);
-    public static final Voltage kRollerOutVoltage = Volts.of(-6);
+    public static final Voltage kRollerInVoltage = Volts.of(8);
+    public static final Voltage kRollerOutVoltage = Volts.of(-8);
     
     // mechanical
     public static final double kPivotGearing = 1.0; // TODO: might be incorrect

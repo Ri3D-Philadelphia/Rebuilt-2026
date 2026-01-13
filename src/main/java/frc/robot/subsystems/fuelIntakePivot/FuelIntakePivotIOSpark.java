@@ -25,7 +25,7 @@ public class FuelIntakePivotIOSpark implements FuelIntakePivotIO {
         0, 
         -0.5,
         Degrees.of(-250), 
-        Degrees.of(-2700)
+        Degrees.of(-2800)
     );
 
     private SparkMax pivotMotor = new SparkMax(
