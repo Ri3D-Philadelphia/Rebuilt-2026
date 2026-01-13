@@ -6,6 +6,7 @@ package frc.robot.subsystems.fuelIntakeRoller;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.fuelIntakePivot.FuelIntakePivot;
@@ -71,6 +72,7 @@ public class FuelIntakeRoller extends SubsystemBase {
      * Set the roller motor voltage based on roller state.
      */
     public Command holdRoller() {
+        SmartDashboard.putString("Desired Roller State", desiredState.toString());
         return run(() -> {
             if (!pivotRef.isExtended()) {
                 io.setRollerVoltage(Volts.of(0));

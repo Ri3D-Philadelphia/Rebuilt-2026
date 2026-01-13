@@ -27,13 +27,13 @@ import frc.robot.subsystems.shooterHood.ShooterHood;
 
 @Logged
 public class RobotContainer {
-    private SwerveDrive swerveDrive = new SwerveDrive();
+    // private SwerveDrive swerveDrive = new SwerveDrive();
     private FuelIntakePivot fuelIntakePivot = new FuelIntakePivot();
-    private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller(fuelIntakePivot);
-    private Indexer indexer = new Indexer();
-    private ShooterHood shooterHood = new ShooterHood();
-    private final ShooterFlywheel m_shooterFlywheel = new ShooterFlywheel();
-    private Climb climb = new Climb();
+    // private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller(fuelIntakePivot);
+    // private Indexer indexer = new Indexer();
+    // private ShooterHood shooterHood = new ShooterHood();
+    // private final ShooterFlywheel m_shooterFlywheel = new ShooterFlywheel();
+    // private Climb climb = new Climb();
 
   
     private final Pigeon2Gyro pigeon = new Pigeon2Gyro(30); // CAN ID 30
@@ -64,20 +64,20 @@ public class RobotContainer {
         
         // fuelIntakePivot.home().schedule(); // TODO: Test this
 
-        m_shooterFlywheel.setDefaultCommand(m_shooterFlywheel.set(0));
+        // m_shooterFlywheel.setDefaultCommand(m_shooterFlywheel.set(0));
 
      }
 
     private void configureBindings1() {
-        // Configure your button bindings here
-         // Schedule `setVelocity` when the Xbox controller's B button is pressed,
-        // cancelling on release.
-        driver.a().whileTrue(m_shooterFlywheel.setSpeed(RotationsPerSecond.of(60)));
-        driver.b().whileTrue(m_shooterFlywheel.setSpeed(RotationsPerSecond.of(300)));
-        // Schedule `set` when the Xbox controller's B button is pressed,
-        // cancelling on release.
-        driver.x().whileTrue(m_shooterFlywheel.set(0.3));
-        driver.y().whileTrue(m_shooterFlywheel.set(-0.3));
+        // // Configure your button bindings here
+        //  // Schedule `setVelocity` when the Xbox controller's B button is pressed,
+        // // cancelling on release.
+        // driver.a().whileTrue(m_shooterFlywheel.setSpeed(RotationsPerSecond.of(60)));
+        // driver.b().whileTrue(m_shooterFlywheel.setSpeed(RotationsPerSecond.of(300)));
+        // // Schedule `set` when the Xbox controller's B button is pressed,
+        // // cancelling on release.
+        // driver.x().whileTrue(m_shooterFlywheel.set(0.3));
+        // driver.y().whileTrue(m_shooterFlywheel.set(-0.3));
       
       
         // call in a periodic or button action:
@@ -86,7 +86,7 @@ public class RobotContainer {
             
         // }, swerveDrive).schedule();
         
-        Trigger xButton = driver.x();
+        // Trigger xButton = driver.x();
         // xButton.whileTrue(
         //     swerveDrive.GO()
         // );
@@ -102,16 +102,16 @@ public class RobotContainer {
 
         // Trigger lJoy = driver.leftStick();
 
-        xButton.whileTrue(swerveDrive.driveFieldCentric(
-            driverForward, 
-            driverStrafe, 
-            driverTurn
-        ));
-        xButton.whileFalse(swerveDrive.driveFieldCentric(
-            () -> 0, 
-            () -> 0, 
-            () -> 0
-        ));
+        // xButton.whileTrue(swerveDrive.driveFieldCentric(
+        //     driverForward, 
+        //     driverStrafe, 
+        //     driverTurn
+        // ));
+        // xButton.whileFalse(swerveDrive.driveFieldCentric(
+        //     () -> 0, 
+        //     () -> 0, 
+        //     () -> 0
+        // ));
 
 
         
@@ -140,19 +140,19 @@ public class RobotContainer {
             fuelIntakePivot.holdPosition()
         );
 
-        fuelIntakeRoller.setDefaultCommand(
-            fuelIntakeRoller.holdRoller()
-        );
+        // fuelIntakeRoller.setDefaultCommand(
+        //     fuelIntakeRoller.holdRoller()
+        // );
 
 
 
 
 
 
-        // TODO: Testing intake homing
-        // TODO: TEMPORARY BINDING, REMOVE LATER
-        Trigger backButton = driver.back();
-        backButton.onTrue(fuelIntakePivot.home());
+        // // TODO: Testing intake homing
+        // // TODO: TEMPORARY BINDING, REMOVE LATER
+        // Trigger backButton = driver.back();
+        // backButton.onTrue(fuelIntakePivot.home());
 
 
 
@@ -160,50 +160,50 @@ public class RobotContainer {
 
 
         // Intake commands
-        Trigger leftBumper = driver.leftBumper();
+        // Trigger leftBumper = driver.leftBumper();
         Trigger leftTrigger = driver.leftTrigger();
 
         leftTrigger.onTrue(
             Commands.runOnce(() -> {
-                if (fuelIntakePivot.isExtended()
-                    && fuelIntakeRoller.isRollingIn()) {
+                if (fuelIntakePivot.isExtended() ){
+                    // && fuelIntakeRoller.isRollingIn()) {
 
                     // Toggle OFF
-                    fuelIntakeRoller.setStopped();
+                    // fuelIntakeRoller.setStopped();
                     fuelIntakePivot.setRetracted();
 
                 } else {
                     // Turn ON / Change direction
                     fuelIntakePivot.setExtended();
-                    fuelIntakeRoller.setRollIn();
+                    // fuelIntakeRoller.setRollIn();
                 }
             })
         );
 
-        leftBumper.onTrue(
-            Commands.runOnce(() -> {
-                if (fuelIntakePivot.isExtended()
-                    && fuelIntakeRoller.isRollingOut()) {
+        // leftBumper.onTrue(
+        //     Commands.runOnce(() -> {
+        //         if (fuelIntakePivot.isExtended()
+        //             && fuelIntakeRoller.isRollingOut()) {
 
-                    // Toggle OFF
-                    fuelIntakeRoller.setStopped();
-                    fuelIntakePivot.setRetracted();
+        //             // Toggle OFF
+        //             fuelIntakeRoller.setStopped();
+        //             fuelIntakePivot.setRetracted();
 
-                } else {
-                    // Turn ON / Change direction
-                    fuelIntakePivot.setExtended();
-                    fuelIntakeRoller.setRollOut();
-                }
-            })
-        );
-
-
+        //         } else {
+        //             // Turn ON / Change direction
+        //             fuelIntakePivot.setExtended();
+        //             fuelIntakeRoller.setRollOut();
+        //         }
+        //     })
+        // );
 
 
-        // TODO: Testing indexer 
-        // TODO: TEMPORARY BINDING, REMOVE LATER
-        Trigger startButton = driver.start();
-        startButton.onTrue(indexer.runIndexerOnce());
+
+
+        // // TODO: Testing indexer 
+        // // TODO: TEMPORARY BINDING, REMOVE LATER
+        // Trigger startButton = driver.start();
+        // startButton.onTrue(indexer.runIndexerOnce());
 
 
 

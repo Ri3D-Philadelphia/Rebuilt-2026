@@ -12,13 +12,13 @@ import edu.wpi.first.units.measure.Voltage;
 @Logged
 public class FuelIntakePivotConstants {
     // CAN
-    public static final int kPivotMotorId = 9;
+    public static final int kPivotMotorId = 2;
     public static final boolean kInverted = false;
     public static final int kCurrentLimit = 40;
     
     // homing
     public static final Voltage kHomeVoltage = Volts.of(-2);
-    public static final Current kHomeCurrentThresh = Amps.of(15);
+    public static final Current kHomeCurrentThresh = Amps.of(1);
     
     // mechanical
     public static final double kPivotGearing = 1.0; // TODO: ASK MECH!!!

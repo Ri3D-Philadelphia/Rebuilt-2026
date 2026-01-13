@@ -9,7 +9,7 @@ import edu.wpi.first.units.measure.Voltage;
 @Logged
 public class FuelIntakeRollerConstants {
     // CAN
-    public static final int kRollerMotorId = 10;
+    public static final int kRollerMotorId = 3;
 
     // moc outputs
     public static final Voltage kRollerInVoltage = Volts.of(3);
