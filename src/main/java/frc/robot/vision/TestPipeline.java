@@ -1,10 +1,17 @@
 package frc.robot.vision;
 
+import edu.wpi.first.apriltag.AprilTagDetection;
+import edu.wpi.first.apriltag.AprilTagDetector;
+import edu.wpi.first.apriltag.AprilTagPoseEstimator;
 import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.vision.VisionPipeline;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.opencv.core.*;
 import org.opencv.imgproc.*;
+import org.opencv.objdetect.Objdetect;
 
 /**
 * TestPipeline class.
@@ -15,137 +22,98 @@ import org.opencv.imgproc.*;
 */
 public class TestPipeline implements VisionPipeline {
 
-	//Outputs
-	private Mat blurOutput = new Mat();
-	private Mat cvThresholdOutput = new Mat();
 	private CvSource outputStream;
+
+	private AprilTagDetector detector;
+	private AprilTagPoseEstimator poseEstimator;
 
 	static {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
 
-	public TestPipeline(CvSource outputStream) {
-		this.outputStream = outputStream;
+	public TestPipeline() {
+		// this.outputStream = outputStream;
+		detector = new AprilTagDetector();
+        detector.addFamily("tag36h11");
+
+        AprilTagPoseEstimator.Config poseConfig =
+            new AprilTagPoseEstimator.Config(
+                Units.inchesToMeters(6.5), // Tag size (official FRC tag)
+                546.6314297825006,         // fx
+                547.4164926890426,         // fy
+                333.04330891767796,        // cx
+                243.95434359639907         // cy
+            );
+
+        poseEstimator =
+            new AprilTagPoseEstimator(poseConfig);
 	}
 
 	/**
 	 * This is the primary method that runs the entire pipeline and updates the outputs.
 	 */
 	@Override	public void process(Mat source0) {
-		// Step Blur0:
-		Mat blurInput = source0;
-		BlurType blurType = BlurType.get("Gaussian Blur");
-		double blurRadius = 10.81081081081081;
-		blur(blurInput, blurType, blurRadius, blurOutput);
-
-		// Step CV_Threshold0:
-		Mat cvThresholdSrc = blurOutput;
-		double cvThresholdThresh = 64.0;
-		double cvThresholdMaxval = 255.0;
-		int cvThresholdType = Imgproc.THRESH_BINARY;
-		cvThreshold(cvThresholdSrc, cvThresholdThresh, cvThresholdMaxval, cvThresholdType, cvThresholdOutput);
+		// Mat mat = source0.clone();
+		Mat gray = new Mat();
+		Imgproc.cvtColor(source0, gray, Imgproc.COLOR_BGR2GRAY);
 		
-		outputStream.putFrame(blurOutput);
+		Dictionary dictionary = Objdetect.getPredefinedDictionary(Objdetect.DICT_APRILTAG_36h11);
+		
+		AprilTagDetection[] detections = detector.detect(gray);
+
+		SmartDashboard.putNumber("# of Detections", detections.length);
+		SmartDashboard.putString("Image shape", gray.size().toString());
+		SmartDashboard.putNumber("Image dims", gray.dims());
+		
+		SmartDashboard.putString("I KNOW U WORK", "!!!!" + Math.random());
+		String grayImgString = gray.get(0, 0)[0] + "," + gray.get(0, 1)[0] + "," + gray.get(0, 2)[0];
+		SmartDashboard.putString("GRAY IMG", grayImgString);
+		SmartDashboard.putString("GrayImgMetadata", gray.toString());
+		// SmartDashboard.putNumberArray("gray img", pixelVals);
+		
+		// for (AprilTagDetection detection : detections) {
+		// 	int id = detection.getId();
+
+		// 	// Estimate pose
+		// 	Transform3d pose = poseEstimator.estimate(detection);
+
+		// 	// Draw outline
+		// 	double[] cornersDoubleArr = detection.getCorners();
+		// 	Point[] corners = new Point[4];
+		// 	for (int i = 0; i < 4; i++) {
+		// 		corners[i] = new Point(cornersDoubleArr[2 * i], cornersDoubleArr[2 * i + 1]);
+		// 	}
+		// 	for (int i = 0; i < 4; i++) {
+		// 		Imgproc.line(
+		// 			mat,
+		// 			corners[i],
+		// 			corners[(i + 1) % 4],
+		// 			new Scalar(0, 255, 0),
+		// 			2
+		// 		);
+		// 	}
+
+		// 	// Draw ID
+		// 	Imgproc.putText(
+		// 		mat,
+		// 		"ID " + id,
+		// 		corners[0],
+		// 		Imgproc.FONT_HERSHEY_SIMPLEX,
+		// 		0.6,
+		// 		new Scalar(0, 255, 0),
+		// 		2
+		// 	);
+
+		// 	// Example: publish distance
+		// 	SmartDashboard.putNumber(
+		// 		"Tag " + id + " Z (m)",
+		// 		pose.getZ()
+		// 	);
+		// }
+
+		// outputStream.putFrame(mat);
 
 	}
-
-	/**
-	 * This method is a generated getter for the output of a Blur.
-	 * @return Mat output from Blur.
-	 */
-	public Mat blurOutput() {
-		return blurOutput;
-	}
-
-	/**
-	 * This method is a generated getter for the output of a CV_Threshold.
-	 * @return Mat output from CV_Threshold.
-	 */
-	public Mat cvThresholdOutput() {
-		return cvThresholdOutput;
-	}
-
-
-	/**
-	 * An indication of which type of filter to use for a blur.
-	 * Choices are BOX, GAUSSIAN, MEDIAN, and BILATERAL
-	 */
-	enum BlurType{
-		BOX("Box Blur"), GAUSSIAN("Gaussian Blur"), MEDIAN("Median Filter"),
-			BILATERAL("Bilateral Filter");
-
-		private final String label;
-
-		BlurType(String label) {
-			this.label = label;
-		}
-
-		public static BlurType get(String type) {
-			if (BILATERAL.label.equals(type)) {
-				return BILATERAL;
-			}
-			else if (GAUSSIAN.label.equals(type)) {
-			return GAUSSIAN;
-			}
-			else if (MEDIAN.label.equals(type)) {
-				return MEDIAN;
-			}
-			else {
-				return BOX;
-			}
-		}
-
-		@Override
-		public String toString() {
-			return this.label;
-		}
-	}
-
-	/**
-	 * Softens an image using one of several filters.
-	 * @param input The image on which to perform the blur.
-	 * @param type The blurType to perform.
-	 * @param doubleRadius The radius for the blur.
-	 * @param output The image in which to store the output.
-	 */
-	private void blur(Mat input, BlurType type, double doubleRadius,
-		Mat output) {
-		int radius = (int)(doubleRadius + 0.5);
-		int kernelSize;
-		switch(type){
-			case BOX:
-				kernelSize = 2 * radius + 1;
-				Imgproc.blur(input, output, new Size(kernelSize, kernelSize));
-				break;
-			case GAUSSIAN:
-				kernelSize = 6 * radius + 1;
-				Imgproc.GaussianBlur(input,output, new Size(kernelSize, kernelSize), radius);
-				break;
-			case MEDIAN:
-				kernelSize = 2 * radius + 1;
-				Imgproc.medianBlur(input, output, kernelSize);
-				break;
-			case BILATERAL:
-				Imgproc.bilateralFilter(input, output, -1, radius, radius);
-				break;
-		}
-	}
-
-	/**
-	 * Apply a fixed-level threshold to each array element in an image.
-	 * @param src Image to threshold.
-	 * @param threshold threshold value.
-	 * @param maxVal Maximum value for THRES_BINARY and THRES_BINARY_INV
-	 * @param type Type of threshold to appy.
-	 * @param dst output Image.
-	 */
-	private void cvThreshold(Mat src, double threshold, double maxVal, int type,
-		Mat dst) {
-		Imgproc.threshold(src, dst, threshold, maxVal, type);
-	}
-
-
-
 
 }
 

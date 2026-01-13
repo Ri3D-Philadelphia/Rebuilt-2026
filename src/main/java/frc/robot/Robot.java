@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drivetrain.Pigeon2Gyro;
-import frc.robot.vision.AprilTagVisionThread;
 import frc.robot.vision.TestPipeline;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -41,9 +40,6 @@ public class Robot extends TimedRobot {
   private static final int IMG_HEIGHT = 480;
   private VisionThread visionThread;
 
-  // @Logged(name = "AprilTagVisionThread")
-  // private final Thread aprilTagVisionThread;
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.  
@@ -63,12 +59,109 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     UsbCamera camera = CameraServer.startAutomaticCapture();
-    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+    // camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+    // camera.setResolution(640, 480);
+    // camera.setConfigJson("{\r\n" + //
+    //                 "    \"fps\": 25,\r\n" + //
+    //                 "    \"height\": 480,\r\n" + //
+    //                 "    \"pixel format\": \"mjpeg\",\r\n" + //
+    //                 "    \"properties\": [\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"connect_verbose\",\r\n" + //
+    //                 "            \"value\": 1\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"raw_brightness\",\r\n" + //
+    //                 "            \"value\": 0\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"brightness\",\r\n" + //
+    //                 "            \"value\": 50\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"raw_contrast\",\r\n" + //
+    //                 "            \"value\": 32\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"contrast\",\r\n" + //
+    //                 "            \"value\": 50\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"raw_saturation\",\r\n" + //
+    //                 "            \"value\": 64\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"saturation\",\r\n" + //
+    //                 "            \"value\": 50\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"raw_hue\",\r\n" + //
+    //                 "            \"value\": 0\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"hue\",\r\n" + //
+    //                 "            \"value\": 50\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"white_balance_temperature_auto\",\r\n" + //
+    //                 "            \"value\": true\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"gamma\",\r\n" + //
+    //                 "            \"value\": 100\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"raw_gain\",\r\n" + //
+    //                 "            \"value\": 0\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"gain\",\r\n" + //
+    //                 "            \"value\": 0\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"power_line_frequency\",\r\n" + //
+    //                 "            \"value\": 2\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"white_balance_temperature\",\r\n" + //
+    //                 "            \"value\": 4600\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"raw_sharpness\",\r\n" + //
+    //                 "            \"value\": 3\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"sharpness\",\r\n" + //
+    //                 "            \"value\": 50\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"backlight_compensation\",\r\n" + //
+    //                 "            \"value\": 1\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"exposure_auto\",\r\n" + //
+    //                 "            \"value\": 1\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"raw_exposure_absolute\",\r\n" + //
+    //                 "            \"value\": 10\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"exposure_absolute\",\r\n" + //
+    //                 "            \"value\": 10\r\n" + //
+    //                 "        },\r\n" + //
+    //                 "        {\r\n" + //
+    //                 "            \"name\": \"exposure_auto_priority\",\r\n" + //
+    //                 "            \"value\": false\r\n" + //
+    //                 "        }\r\n" + //
+    //                 "    ],\r\n" + //
+    //                 "    \"width\": 640\r\n" + //
+    //                 "}");
 
-    CvSource outputStream =
-        CameraServer.putVideo("Rectangle", 640, 480);
+    // CvSource outputStream =
+    //     CameraServer.putVideo("Rectangle", 640, 480);
 
-    visionThread = new VisionThread(camera, new TestPipeline(outputStream), pipeline -> {
+    visionThread = new VisionThread(camera, new TestPipeline(), pipeline -> {
       // if (!pipeline.filterContoursOutput().isEmpty()) {
       //   Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
       //   synchronized (imgLock) {
