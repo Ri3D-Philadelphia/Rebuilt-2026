@@ -111,6 +111,11 @@ public class SwerveDriveIOSpark implements SwerveDriveIO {
         );
     }
 
+    public Rotation2d getHeading() {
+        return pigeon.getHeading();
+    }
+
+
     /**
      * Configures the SparkMaxes.
      */

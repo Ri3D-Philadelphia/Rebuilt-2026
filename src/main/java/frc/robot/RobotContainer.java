@@ -123,19 +123,16 @@ public class RobotContainer {
         Trigger xButton = driver.x();
 
         xButton.whileTrue(swerveDrive.driveFieldCentric(
-            () -> 0, 
-            () -> 0, 
-            () -> {
-                double[] tagCenter = AprilTagReceiver.readVisionData();
-                if (tagCenter[0] < 0 || tagCenter[1] < 0) return 0;
-                return Constants.kAutoAimKP * (tagCenter[0] - 320);
-            }
+            () -> AprilTagReceiver.readVisionData(),
+            () -> pigeon.getHeading()
         ))
-            .whileFalse(swerveDrive.driveFieldCentric(
+            .whileFalse(
+                swerveDrive.driveFieldCentric(
             () -> 0, 
             () -> 0, 
             () -> 0
-        ));
+        )
+        );
 
 
 

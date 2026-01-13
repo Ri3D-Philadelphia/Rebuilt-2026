@@ -222,10 +222,11 @@ public class Robot extends TimedRobot {
     } else {
       SmartDashboard.putString("PigeonYawDeg", "pigeon null");
     }
-  } catch (Throwable t) {
-    SmartDashboard.putString("PigeonYawDeg", "err: " + t.getMessage());
-    t.printStackTrace();
-  }
+    } catch (Throwable t) {
+      SmartDashboard.putString("PigeonYawDeg", "err: " + t.getMessage());
+      t.printStackTrace();
+    }
+
   }
 
   /**

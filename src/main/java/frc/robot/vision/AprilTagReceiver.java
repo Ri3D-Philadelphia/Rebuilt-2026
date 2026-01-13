@@ -37,16 +37,19 @@ public class AprilTagReceiver {
         }
 
         double[] tag0Array = tag0Entry.getDoubleArray(new double[0]);
-        if (tag0Array.length < 2) {
+        if (tag0Array.length < 5) {
             // System.out.println("'tag0' array is missing or too short.");
             return new double[]{-1, -1};
         }
 
         // Extract x and y coordinates
-        double x = tag0Array[0];
-        double y = tag0Array[1];
+        double cx = tag0Array[0];
+        double cy = tag0Array[1];
+        double xt = tag0Array[2];
+        double yt = tag0Array[3];
+        double yaw = tag0Array[4];
 
-        return new double[]{x, y};
+        return new double[]{cx, cy, xt, yt, yaw};
     }
     
 }
