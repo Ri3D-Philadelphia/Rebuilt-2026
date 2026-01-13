@@ -22,6 +22,7 @@ public class Constants {
 
     public static class HoodConstants {
         public static final int kHoodMotorId = 19;
+        public static boolean kInverted;
     }
 
 }

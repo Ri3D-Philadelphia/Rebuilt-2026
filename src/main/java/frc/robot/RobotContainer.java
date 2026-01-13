@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.climber.Climb;
 import frc.robot.subsystems.drivetrain.Pigeon2Gyro;
 
@@ -11,6 +12,8 @@ import frc.robot.subsystems.drivetrain.Pigeon2Gyro;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -22,6 +25,8 @@ import frc.robot.subsystems.fuelIntakeRoller.FuelIntakeRoller;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.shooterFlywheel.ShooterFlywheel;
 import frc.robot.subsystems.shooterHood.ShooterHood;
+import frc.robot.subsystems.shooterFlywheel.ShooterFlywheelConstants;
+import frc.robot.subsystems.shooterHood.ShooterHoodConstants;
 
 
 
@@ -31,17 +36,17 @@ public class RobotContainer {
     private FuelIntakePivot fuelIntakePivot = new FuelIntakePivot();
     private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller(fuelIntakePivot);
     private Indexer indexer = new Indexer();
-    // private ShooterHood shooterHood = new ShooterHood();
-    // private final ShooterFlywheel m_shooterFlywheel = new ShooterFlywheel();
-    // private Climb climb = new Climb();
+    private final ShooterHood hood = new ShooterHood();
+    private final ShooterFlywheel shooter = new ShooterFlywheel();
+    private Climb climb = new Climb();
 
   
-    private final Pigeon2Gyro pigeon = new Pigeon2Gyro(30); // CAN ID 30
+    // private final Pigeon2Gyro pigeon = new Pigeon2Gyro(30); // CAN ID 30
 
     
-        public Pigeon2Gyro getPigeon() {
-            return this.pigeon;
-        }
+    //     public Pigeon2Gyro getPigeon() {
+    //         return this.pigeon;
+    //     }
 
     // gamepads
     private CommandXboxController driver = new CommandXboxController(0);
@@ -64,20 +69,11 @@ public class RobotContainer {
         
         // fuelIntakePivot.home().schedule(); // TODO: Test this
 
-        // m_shooterFlywheel.setDefaultCommand(m_shooterFlywheel.set(0));
+       //  m_shooterFlywheel.setDefaultCommand(m_shooterFlywheel.set(0));
 
      }
 
     private void configureBindings1() {
-        // // Configure your button bindings here
-        //  // Schedule `setVelocity` when the Xbox controller's B button is pressed,
-        // // cancelling on release.
-        // driver.a().whileTrue(m_shooterFlywheel.setSpeed(RotationsPerSecond.of(60)));
-        // driver.b().whileTrue(m_shooterFlywheel.setSpeed(RotationsPerSecond.of(300)));
-        // // Schedule `set` when the Xbox controller's B button is pressed,
-        // // cancelling on release.
-        // driver.x().whileTrue(m_shooterFlywheel.set(0.3));
-        // driver.y().whileTrue(m_shooterFlywheel.set(-0.3));
       
       
         // call in a periodic or button action:
@@ -87,50 +83,122 @@ public class RobotContainer {
         // }, swerveDrive).schedule();
         
         // Trigger xButton = driver.x();
-        // xButton.whileTrue(
-        //     swerveDrive.GO()
-        // );
-        // xButton.whileFalse(
-        //     swerveDrive.STOP()
-        // );
-        // xButton.whileTrue(swerveDrive.driveFieldCentric(
-        //     1, 0, 0
-        // ));
-        // xButton.whileFalse(swerveDrive.driveFieldCentric(
-        //     0, 0, 0
-        // ));
 
         // Trigger lJoy = driver.leftStick();
 
-        // xButton.whileTrue(swerveDrive.driveFieldCentric(
-        //     driverForward, 
-        //     driverStrafe, 
-        //     driverTurn
-        // ));
-        // xButton.whileFalse(swerveDrive.driveFieldCentric(
-        //     () -> 0, 
-        //     () -> 0, 
-        //     () -> 0
-        // ));
+        driver.x().whileTrue(swerveDrive.driveFieldCentric(
+            driverForward, 
+            driverStrafe, 
+            driverTurn
+        ));
+        swerveDrive.setDefaultCommand(swerveDrive.driveFieldCentric(
+            () -> 0, 
+            () -> 0, 
+            () -> 0
+        ));
 
 
+        // ========= CLIMB CONTROLS =========
+
+        // driver.x().whileTrue(climb.climbDown()
+        //     .repeatedly()
+        //     .until(climb::atSetpoint));
+        // driver.y().whileTrue(climb.climbUp()
+        //     .repeatedly()
+        //     .until(climb::atSetpoint));
         
-        // swerveDrive.setDefaultCommand(driveCommand);
-
-                // Using CommandXboxController driver (you have this)
-        driver.y().onTrue(new InstantCommand(() -> {
-            pigeon.zeroHeading();
-            System.out.println("[PIGEON] zeroed");
-        }));
+        driver.a().whileTrue(climb.setVoltage1());
+        driver.b().whileTrue(climb.setVoltageminus1());
+        driver.start().whileTrue(climb.resetEncoder());
+        climb.setDefaultCommand(climb.stop());
 
 
+         // ==================== SHOOTING ====================
+        
+        // Keep flywheel always spinning at default speed for instant response
+        // shooter.setDefaultCommand(shooter.spinToDefault());
 
-        // new RunCommand(() -> {
-        //     double yawDeg = pigeon.getHeading().getDegrees();
-        //     SmartDashboard.putNumber("PigeonYawDeg", yawDeg);      // Shuffleboard / SmartDashboard
-        //     System.out.println("[PIGEON] yaw deg = " + yawDeg);   // console log (driver station)
-        // }).schedule();
-   
+        shooter.setDefaultCommand(shooter.stop());
+        
+        // Right Bumper → SHOOT!
+        // Complete shooting sequence: wait for speed → feed note
+        // driver.rightBumper().onTrue(
+        //     Commands.sequence(
+        //         // Ensure shooter is at target speed
+        //         Commands.waitUntil(shooter::atSpeed).withTimeout(1.0),
+                
+        //         // Feed the note for 0.5 seconds
+        //         indexer.runIndexerOnce().withTimeout(0.5),
+                
+        //         // Brief pause after feeding
+        //         Commands.waitSeconds(0.1)
+        //     ).withName("Shoot")
+        // );
+
+        driver.rightTrigger().onTrue(shooter.powerFlywheel()).onFalse(shooter.stop());
+        
+
+        // ==================== HOOD ANGLE ADJUSTMENT ====================
+        
+        // // DPad Up → Increase hood angle (shoot farther)
+        // driver.povUp().onTrue(
+        //     Commands.parallel(
+        //         hood.adjustAngleCommand(5.0),  // Increase by 5 degrees
+        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
+        //     ).withName("IncreaseShotDistance")
+        // );
+        
+        // // DPad Down → Decrease hood angle (shoot closer)
+        // driver.povDown().onTrue(
+        //     Commands.parallel(
+        //         hood.adjustAngleCommand(-5.0),  // Decrease by 5 degrees
+        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kCloseShootRPM), shooter)
+        //     ).withName("DecreaseShotDistance")
+        // );
+        
+        // // DPad Left → Preset: Close shot
+        // driver.povLeft().onTrue(
+        //     Commands.parallel(
+        //         hood.setAngleCommand(ShooterHoodConstants.kCloseAngleDeg),
+        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
+        //     ).withName("CloseShot")
+        // );
+        
+        // // DPad Right → Preset: Far shot
+        // driver.povRight().onTrue(
+        //     Commands.parallel(
+        //         hood.setAngleCommand(ShooterHoodConstants.kFarAngleDeg),
+        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
+        //     ).withName("FarShot")
+        // );
+
+
+        // DPad Up → Increase hood angle (shoot farther)
+        driver.povUp().onTrue(
+            Commands.parallel(
+                hood.adjustAngleCommand(0.05),  // Increase by 5 degrees
+                Commands.runOnce(() -> shooter.powerFlywheel(), shooter)
+            ).withName("IncreaseShotDistance")
+        );
+        
+        // DPad Down → Decrease hood angle (shoot closer)
+        driver.povDown().onTrue(
+            Commands.parallel(
+                hood.adjustAngleCommand(-0.05),  // Increase by 5 degrees
+                Commands.runOnce(() -> shooter.powerFlywheel(), shooter)
+            ).withName("DecreaseShotDistance"));
+        
+
+        // ==================== GYRO RESET ====================
+        
+        // Left Stick & Right Stick (pressed together) → Reset gyro
+        driver.leftStick().and(driver.rightStick()).onTrue(
+            Commands.runOnce(() -> {
+                // swerveDrive.resetGyro();  // Uncomment when method exists
+                System.out.println("Gyro reset!");
+            }).withName("ResetGyro")
+        );
+
       
     }
 
@@ -143,20 +211,6 @@ public class RobotContainer {
         fuelIntakeRoller.setDefaultCommand(
             fuelIntakeRoller.holdRoller()
         );
-
-
-
-
-
-
-        // // TODO: Testing intake homing
-        // // TODO: TEMPORARY BINDING, REMOVE LATER
-        // Trigger backButton = driver.back();
-        // backButton.onTrue(fuelIntakePivot.home());
-
-
-
-
 
 
         // Intake commands
@@ -197,16 +251,11 @@ public class RobotContainer {
             })
         );
 
-
-
-
         // TODO: Testing indexer 
         // TODO: TEMPORARY BINDING, REMOVE LATER
 
         Trigger rightBumper = driver.rightBumper();
         rightBumper.onTrue(indexer.runIndexerOnce().andThen(indexer.runSecondIndexerOnce()));
-
-
 
 
 

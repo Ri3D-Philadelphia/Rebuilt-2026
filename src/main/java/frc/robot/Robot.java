@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.epilogue.Epilogue;
+// import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
     DataLogManager.start();
 
     // Shuffleboard.getTab("Pigeon").add(gyro);
-    Epilogue.bind(this);
+      // Epilogue.bind(this);
   }
 
   /**
@@ -56,18 +56,18 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
   
-    try {
-    Pigeon2Gyro pigeon = m_robotContainer.getPigeon();
-    if (pigeon != null) {
-      double yawDeg = pigeon.getHeading().getDegrees();
-      SmartDashboard.putNumber("PigeonYawDeg", yawDeg);
-    } else {
-      SmartDashboard.putString("PigeonYawDeg", "pigeon null");
-    }
-  } catch (Throwable t) {
-    SmartDashboard.putString("PigeonYawDeg", "err: " + t.getMessage());
-    t.printStackTrace();
-  }
+  //   try {
+  //   Pigeon2Gyro pigeon = m_robotContainer.getPigeon();
+  //   if (pigeon != null) {
+  //     double yawDeg = pigeon.getHeading().getDegrees();
+  //     SmartDashboard.putNumber("PigeonYawDeg", yawDeg);
+  //   } else {
+  //     SmartDashboard.putString("PigeonYawDeg", "pigeon null");
+  //   }
+  // } catch (Throwable t) {
+  //   SmartDashboard.putString("PigeonYawDeg", "err: " + t.getMessage());
+  //   t.printStackTrace();
+  // }
   }
 
   /**
