@@ -10,7 +10,9 @@ import edu.wpi.first.units.measure.Voltage;
 @Logged
 public class IndexerConstants {
     public static final int kIndexerMotorId = 4;
+    public static final int kSecondIndexerMotorId = 8;
     public static final boolean kInverted = false;
+    public static final boolean kSecondInverted = false;
     public static final int kCurrentLimit = 40;
     
     // mechanical
@@ -18,7 +20,9 @@ public class IndexerConstants {
 
     // moc outputs
     public static final Voltage kIndexerOnVoltage = Volts.of(3);
-    public static final Time kIndexerRunTime = Seconds.of(2);
+    public static final Time kIndexerRunTime = Seconds.of(1);
+    public static final Voltage kSecondIndexerOnVoltage = Volts.of(3);
+    public static final Time kSecondIndexerRunTime = Seconds.of(1);
 
     // moc config
     public static final double kIndexerPositionConversionFactor = 1 / kIndexerGearing;

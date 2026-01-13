@@ -30,7 +30,7 @@ public class RobotContainer {
     // private SwerveDrive swerveDrive = new SwerveDrive();
     private FuelIntakePivot fuelIntakePivot = new FuelIntakePivot();
     private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller(fuelIntakePivot);
-    // private Indexer indexer = new Indexer();
+    private Indexer indexer = new Indexer();
     // private ShooterHood shooterHood = new ShooterHood();
     // private final ShooterFlywheel m_shooterFlywheel = new ShooterFlywheel();
     // private Climb climb = new Climb();
@@ -200,10 +200,11 @@ public class RobotContainer {
 
 
 
-        // // TODO: Testing indexer 
-        // // TODO: TEMPORARY BINDING, REMOVE LATER
-        // Trigger startButton = driver.start();
-        // startButton.onTrue(indexer.runIndexerOnce());
+        // TODO: Testing indexer 
+        // TODO: TEMPORARY BINDING, REMOVE LATER
+
+        Trigger rightBumper = driver.rightBumper();
+        rightBumper.onTrue(indexer.runIndexerOnce().andThen(indexer.runSecondIndexerOnce()));
 
 
 

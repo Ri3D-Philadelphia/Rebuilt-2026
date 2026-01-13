@@ -15,6 +15,7 @@ import edu.wpi.first.units.measure.Voltage;
 @Logged
 public class IndexerIOSpark implements IndexerIO {
     private SparkFlex indexerMotor = new SparkFlex(IndexerConstants.kIndexerMotorId, MotorType.kBrushless);
+    private SparkFlex secondIndexerMotor = new SparkFlex(IndexerConstants.kSecondIndexerMotorId, MotorType.kBrushless);
 
     public IndexerIOSpark() {
         configureMotors();
@@ -32,6 +33,14 @@ public class IndexerIOSpark implements IndexerIO {
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters
         );
+        secondIndexerMotor.configure(
+            new SparkFlexConfig()
+                .inverted(IndexerConstants.kSecondInverted)
+                .voltageCompensation(IndexerConstants.kNominalVoltage.in(Volts))
+                .smartCurrentLimit(IndexerConstants.kCurrentLimit),
+            ResetMode.kResetSafeParameters,
+            PersistMode.kPersistParameters
+        );
     }
     
     /**
@@ -39,6 +48,13 @@ public class IndexerIOSpark implements IndexerIO {
      */
     public void setIndexerVoltage(Voltage volts) {
         indexerMotor.setVoltage(volts);
+    }
+    
+    /**
+     * Set the second indexer moc voltage.
+     */
+    public void setSecondIndexerVoltage(Voltage volts) {
+        secondIndexerMotor.setVoltage(volts);
     }
     
 }

@@ -7,5 +7,7 @@ import edu.wpi.first.units.measure.Voltage;
 public interface IndexerIO {
     
     default void setIndexerVoltage(Voltage volts) {}
+    
+    default void setSecondIndexerVoltage(Voltage volts) {}
 
 }
