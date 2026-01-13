@@ -9,6 +9,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.vision.VisionPipeline;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import java.util.Dictionary;
+
 import org.opencv.core.*;
 import org.opencv.imgproc.*;
 import org.opencv.objdetect.Objdetect;
@@ -56,7 +58,7 @@ public class TestPipeline implements VisionPipeline {
 		// Mat mat = source0.clone();
 		Mat gray = new Mat();
 		Imgproc.cvtColor(source0, gray, Imgproc.COLOR_BGR2GRAY);
-		
+
 		Dictionary dictionary = Objdetect.getPredefinedDictionary(Objdetect.DICT_APRILTAG_36h11);
 		
 		AprilTagDetection[] detections = detector.detect(gray);
