@@ -26,12 +26,12 @@ import frc.robot.subsystems.shooterHood.ShooterHood;
 @Logged
 public class RobotContainer {
     private SwerveDrive swerveDrive = new SwerveDrive();
-    private FuelIntakePivot fuelIntakePivot = new FuelIntakePivot();
-    private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller();
-    private Indexer indexer = new Indexer();
-    private ShooterHood shooterHood = new ShooterHood();
-    private final ShooterFlywheel m_shooterFlywheel = new ShooterFlywheel();
-    private Climb climb = new Climb();
+    // private FuelIntakePivot fuelIntakePivot = new FuelIntakePivot();
+    // private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller();
+    // private Indexer indexer = new Indexer();
+    // private ShooterHood shooterHood = new ShooterHood();
+    // private final ShooterFlywheel m_shooterFlywheel = new ShooterFlywheel();
+    // private Climb climb = new Climb();
 
   
     private final Pigeon2Gyro pigeon = new Pigeon2Gyro(30); // CAN ID 30
@@ -60,20 +60,20 @@ public class RobotContainer {
         configureBindings1();
         configureBindings2();
 
-        m_shooterFlywheel.setDefaultCommand(m_shooterFlywheel.set(0));
+        // m_shooterFlywheel.setDefaultCommand(m_shooterFlywheel.set(0));
 
      }
 
     private void configureBindings1() {
-        // Configure your button bindings here
-         // Schedule `setVelocity` when the Xbox controller's B button is pressed,
-        // cancelling on release.
-        driver.a().whileTrue(m_shooterFlywheel.setSpeed(RotationsPerSecond.of(60)));
-        driver.b().whileTrue(m_shooterFlywheel.setSpeed(RotationsPerSecond.of(300)));
-        // Schedule `set` when the Xbox controller's B button is pressed,
-        // cancelling on release.
-        driver.x().whileTrue(m_shooterFlywheel.set(0.3));
-        driver.y().whileTrue(m_shooterFlywheel.set(-0.3));
+        // // Configure your button bindings here
+        //  // Schedule `setVelocity` when the Xbox controller's B button is pressed,
+        // // cancelling on release.
+        // driver.a().whileTrue(m_shooterFlywheel.setSpeed(RotationsPerSecond.of(60)));
+        // driver.b().whileTrue(m_shooterFlywheel.setSpeed(RotationsPerSecond.of(300)));
+        // // Schedule `set` when the Xbox controller's B button is pressed,
+        // // cancelling on release.
+        // driver.x().whileTrue(m_shooterFlywheel.set(0.3));
+        // driver.y().whileTrue(m_shooterFlywheel.set(-0.3));
       
       
         // call in a periodic or button action:

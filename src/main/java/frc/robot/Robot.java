@@ -4,14 +4,22 @@
 
 package frc.robot;
 
+import org.opencv.imgproc.Imgproc;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.vision.VisionThread;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drivetrain.Pigeon2Gyro;
+import frc.robot.vision.AprilTagVisionThread;
+import frc.robot.vision.TestPipeline;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
@@ -28,6 +36,13 @@ public class Robot extends TimedRobot {
   // ROBO CONTAINER INSTANCE THING
   @Logged(name = "RobotContainer")
   private final RobotContainer m_robotContainer;
+  
+  private static final int IMG_WIDTH = 640;
+  private static final int IMG_HEIGHT = 480;
+  private VisionThread visionThread;
+
+  // @Logged(name = "AprilTagVisionThread")
+  // private final Thread aprilTagVisionThread;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -39,10 +54,29 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    DataLogManager.start();
+    // DataLogManager.start();
 
     // Shuffleboard.getTab("Pigeon").add(gyro);
     Epilogue.bind(this);
+  }
+
+  @Override
+  public void robotInit() {
+    UsbCamera camera = CameraServer.startAutomaticCapture();
+    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+
+    CvSource outputStream =
+        CameraServer.putVideo("Rectangle", 640, 480);
+
+    visionThread = new VisionThread(camera, new TestPipeline(outputStream), pipeline -> {
+      // if (!pipeline.filterContoursOutput().isEmpty()) {
+      //   Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
+      //   synchronized (imgLock) {
+      //     centerX = r.x + (r.width / 2);
+      //   }
+      // }
+    });
+    visionThread.start();
   }
 
   /**
