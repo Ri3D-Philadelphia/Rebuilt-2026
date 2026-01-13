@@ -20,12 +20,12 @@ import edu.wpi.first.units.measure.Voltage;
 public class FuelIntakePivotIOSpark implements FuelIntakePivotIO {
 
     public static final FuelIntakePivotConfig config = new FuelIntakePivotConfig(
-        0.00001, 
+        0.0025, 
         0, 
         0, 
-        0,
-        Degrees.of(0), 
-        Degrees.of(0)
+        -0.5,
+        Degrees.of(-250), 
+        Degrees.of(-2700)
     );
 
     private SparkMax pivotMotor = new SparkMax(

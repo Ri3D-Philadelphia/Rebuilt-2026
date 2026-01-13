@@ -117,8 +117,8 @@ public class FuelIntakePivot extends SubsystemBase {
      */
     public void runToAngle(Angle desiredAngle) {
         Voltage desiredVoltage = Volts.of(
-            feedForward.calculate(desiredAngle.in(Degrees), 0) + 
-            fuelIntakeController.calculate(inputs.pivotAngle.in(Degrees), desiredAngle.in(Degrees))
+            FuelIntakePivotIOSpark.config.kP() * (desiredAngle.in(Degrees) - inputs.pivotAngle.in(Degrees)) + //feedForward.calculate(desiredAngle.in(Degrees), 0) + 
+            FuelIntakePivotIOSpark.config.kG()//fuelIntakeController.calculate(inputs.pivotAngle.in(Degrees), desiredAngle.in(Degrees))
         );
 
         SmartDashboard.putNumber("runToAngle target ang (deg)", desiredAngle.in(Degrees));

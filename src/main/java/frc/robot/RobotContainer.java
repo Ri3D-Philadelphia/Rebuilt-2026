@@ -29,7 +29,7 @@ import frc.robot.subsystems.shooterHood.ShooterHood;
 public class RobotContainer {
     // private SwerveDrive swerveDrive = new SwerveDrive();
     private FuelIntakePivot fuelIntakePivot = new FuelIntakePivot();
-    // private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller(fuelIntakePivot);
+    private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller(fuelIntakePivot);
     // private Indexer indexer = new Indexer();
     // private ShooterHood shooterHood = new ShooterHood();
     // private final ShooterFlywheel m_shooterFlywheel = new ShooterFlywheel();
@@ -140,9 +140,9 @@ public class RobotContainer {
             fuelIntakePivot.holdPosition()
         );
 
-        // fuelIntakeRoller.setDefaultCommand(
-        //     fuelIntakeRoller.holdRoller()
-        // );
+        fuelIntakeRoller.setDefaultCommand(
+            fuelIntakeRoller.holdRoller()
+        );
 
 
 
@@ -160,42 +160,42 @@ public class RobotContainer {
 
 
         // Intake commands
-        // Trigger leftBumper = driver.leftBumper();
+        Trigger leftBumper = driver.leftBumper();
         Trigger leftTrigger = driver.leftTrigger();
 
         leftTrigger.onTrue(
             Commands.runOnce(() -> {
-                if (fuelIntakePivot.isExtended() ){
-                    // && fuelIntakeRoller.isRollingIn()) {
+                if (fuelIntakePivot.isExtended()
+                    && fuelIntakeRoller.isRollingIn()) {
 
                     // Toggle OFF
-                    // fuelIntakeRoller.setStopped();
+                    fuelIntakeRoller.setStopped();
                     fuelIntakePivot.setRetracted();
 
                 } else {
                     // Turn ON / Change direction
                     fuelIntakePivot.setExtended();
-                    // fuelIntakeRoller.setRollIn();
+                    fuelIntakeRoller.setRollIn();
                 }
             })
         );
 
-        // leftBumper.onTrue(
-        //     Commands.runOnce(() -> {
-        //         if (fuelIntakePivot.isExtended()
-        //             && fuelIntakeRoller.isRollingOut()) {
+        leftBumper.onTrue(
+            Commands.runOnce(() -> {
+                if (fuelIntakePivot.isExtended()
+                    && fuelIntakeRoller.isRollingOut()) {
 
-        //             // Toggle OFF
-        //             fuelIntakeRoller.setStopped();
-        //             fuelIntakePivot.setRetracted();
+                    // Toggle OFF
+                    fuelIntakeRoller.setStopped();
+                    fuelIntakePivot.setRetracted();
 
-        //         } else {
-        //             // Turn ON / Change direction
-        //             fuelIntakePivot.setExtended();
-        //             fuelIntakeRoller.setRollOut();
-        //         }
-        //     })
-        // );
+                } else {
+                    // Turn ON / Change direction
+                    fuelIntakePivot.setExtended();
+                    fuelIntakeRoller.setRollOut();
+                }
+            })
+        );
 
 
 
