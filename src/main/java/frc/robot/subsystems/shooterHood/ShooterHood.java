@@ -30,14 +30,15 @@ public class ShooterHood extends SubsystemBase {
         io.updateInputs(inputs);
 
         // Only run PID if we have a target angle
-        if (targetAngleDeg > 0) {
-            double volts = pid.calculate(inputs.angleDeg, targetAngleDeg);
+        double volts = pid.calculate(inputs.angleDeg, targetAngleDeg) + ShooterHoodConstants.kG;
+        if (volts != 0) {
             io.setVoltage(volts);
         }
         
         // Log to SmartDashboard
         SmartDashboard.putNumber("Hood/CurrentAngle", inputs.angleDeg);
         SmartDashboard.putNumber("Hood/TargetAngle", targetAngleDeg);
+        SmartDashboard.putNumber("Hood/PID Output", volts);
         SmartDashboard.putNumber("Hood/Voltage", inputs.appliedVolts);
         SmartDashboard.putNumber("Hood/Current", inputs.currentAmps);
         SmartDashboard.putBoolean("Hood/AtTarget", atTarget());
@@ -58,7 +59,14 @@ public class ShooterHood extends SubsystemBase {
      * Adjust the current target angle by a delta.
      */
     public void adjustAngle(double deltaDeg) {
-        setAngle(targetAngleDeg + deltaDeg);
+        setAngle(bound(targetAngleDeg + deltaDeg, 0, 1));
+    }
+
+    /**
+     * bound x between lower and upper
+     */
+    private double bound(double x, double lower, double upper) {
+        return Math.min(upper, Math.max(lower, x));
     }
 
     /**
@@ -97,7 +105,7 @@ public class ShooterHood extends SubsystemBase {
      * Command to set the hood to a specific angle.
      */
     public Command setAngleCommand(double angleDeg) {
-        return Commands.runOnce(() -> setAngle(angleDeg), this)
+        return runOnce(() -> setAngle(angleDeg))
             .withName("SetHoodAngle_" + angleDeg);
     }
 
@@ -105,7 +113,7 @@ public class ShooterHood extends SubsystemBase {
      * Command to manually adjust the hood angle by a delta.
      */
     public Command adjustAngleCommand(double deltaDeg) {
-        return Commands.runOnce(() -> adjustAngle(deltaDeg), this)
+        return runOnce(() -> adjustAngle(deltaDeg))
             .withName("AdjustHood_" + deltaDeg);
     }
 

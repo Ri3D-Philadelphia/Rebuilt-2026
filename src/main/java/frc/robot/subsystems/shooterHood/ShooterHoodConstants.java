@@ -15,9 +15,10 @@ public class ShooterHoodConstants {
     public static final double kMaxAngleDeg = 40.0;   // Steep/highest
 
     // PID Constants
-    public static final double kP = 0.015;
+    public static final double kP = 2;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
+    public static final double kG = 3.0;
 
     // Tolerance
     public static final double kAngleToleranceDeg = 1.0;

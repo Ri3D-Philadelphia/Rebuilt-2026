@@ -126,57 +126,78 @@ public class RobotContainer {
          // ==================== SHOOTING ====================
         
         // Keep flywheel always spinning at default speed for instant response
-        shooter.setDefaultCommand(shooter.spinToDefault());
+        // shooter.setDefaultCommand(shooter.spinToDefault());
+
+        shooter.setDefaultCommand(shooter.stop());
         
         // Right Bumper → SHOOT!
         // Complete shooting sequence: wait for speed → feed note
-        driver.rightBumper().onTrue(
-            Commands.sequence(
-                // Ensure shooter is at target speed
-                Commands.waitUntil(shooter::atSpeed).withTimeout(1.0),
+        // driver.rightBumper().onTrue(
+        //     Commands.sequence(
+        //         // Ensure shooter is at target speed
+        //         Commands.waitUntil(shooter::atSpeed).withTimeout(1.0),
                 
-                // Feed the note for 0.5 seconds
-                indexer.runIndexerOnce().withTimeout(0.5),
+        //         // Feed the note for 0.5 seconds
+        //         indexer.runIndexerOnce().withTimeout(0.5),
                 
-                // Brief pause after feeding
-                Commands.waitSeconds(0.1)
-            ).withName("Shoot")
-        );
+        //         // Brief pause after feeding
+        //         Commands.waitSeconds(0.1)
+        //     ).withName("Shoot")
+        // );
+
+        driver.rightTrigger().onTrue(shooter.powerFlywheel()).onFalse(shooter.stop());
         
 
         // ==================== HOOD ANGLE ADJUSTMENT ====================
         
+        // // DPad Up → Increase hood angle (shoot farther)
+        // driver.povUp().onTrue(
+        //     Commands.parallel(
+        //         hood.adjustAngleCommand(5.0),  // Increase by 5 degrees
+        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
+        //     ).withName("IncreaseShotDistance")
+        // );
+        
+        // // DPad Down → Decrease hood angle (shoot closer)
+        // driver.povDown().onTrue(
+        //     Commands.parallel(
+        //         hood.adjustAngleCommand(-5.0),  // Decrease by 5 degrees
+        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kCloseShootRPM), shooter)
+        //     ).withName("DecreaseShotDistance")
+        // );
+        
+        // // DPad Left → Preset: Close shot
+        // driver.povLeft().onTrue(
+        //     Commands.parallel(
+        //         hood.setAngleCommand(ShooterHoodConstants.kCloseAngleDeg),
+        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
+        //     ).withName("CloseShot")
+        // );
+        
+        // // DPad Right → Preset: Far shot
+        // driver.povRight().onTrue(
+        //     Commands.parallel(
+        //         hood.setAngleCommand(ShooterHoodConstants.kFarAngleDeg),
+        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
+        //     ).withName("FarShot")
+        // );
+
+
         // DPad Up → Increase hood angle (shoot farther)
         driver.povUp().onTrue(
             Commands.parallel(
-                hood.adjustAngleCommand(5.0),  // Increase by 5 degrees
-                Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
+                hood.adjustAngleCommand(0.05),  // Increase by 5 degrees
+                Commands.runOnce(() -> shooter.powerFlywheel(), shooter)
             ).withName("IncreaseShotDistance")
         );
         
         // DPad Down → Decrease hood angle (shoot closer)
         driver.povDown().onTrue(
             Commands.parallel(
-                hood.adjustAngleCommand(-5.0),  // Decrease by 5 degrees
-                Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kCloseShootRPM), shooter)
-            ).withName("DecreaseShotDistance")
-        );
+                hood.adjustAngleCommand(-0.05),  // Increase by 5 degrees
+                Commands.runOnce(() -> shooter.powerFlywheel(), shooter)
+            ).withName("DecreaseShotDistance"));
         
-        // DPad Left → Preset: Close shot
-        driver.povLeft().onTrue(
-            Commands.parallel(
-                hood.setAngleCommand(ShooterHoodConstants.kCloseAngleDeg),
-                Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
-            ).withName("CloseShot")
-        );
-        
-        // DPad Right → Preset: Far shot
-        driver.povRight().onTrue(
-            Commands.parallel(
-                hood.setAngleCommand(ShooterHoodConstants.kFarAngleDeg),
-                Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
-            ).withName("FarShot")
-        );
 
         // ==================== GYRO RESET ====================
         

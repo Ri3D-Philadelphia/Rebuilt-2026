@@ -3,6 +3,8 @@ package frc.robot.subsystems.shooterFlywheel;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import static edu.wpi.first.units.Units.Volts;
+
 // removed CTRE ControlMode import to avoid collision with YAMS
 // import com.ctre.phoenix.motorcontrol.ControlMode;
 
@@ -55,9 +57,16 @@ public class ShooterFlywheel extends SubsystemBase {
         io.setVelocityRPM(rpm);
     }
 
-    public void stop(){
-        targetRPM = 0.0;
-        io.stop();
+    public Command powerFlywheel() {
+        return run(() ->io.setVoltage(6));
+    }
+
+    public Command stop(){
+        
+        return run(() -> {
+            targetRPM = 0.0;
+            io.stop();
+            io.setVoltage(0);});
     }
 
     public boolean atSpeed(){
@@ -84,10 +93,12 @@ public class ShooterFlywheel extends SubsystemBase {
      * The command runs continuously - use .withTimeout() or button release to stop.
      */
     public Command spinToRPM(double rpm) {
-        return Commands.run(
-            () -> setVelocityRPM(rpm), 
-            this
-        ).withName("SpinToRPM_" + rpm);
+        // return Commands.run(
+        //     () -> setVelocityRPM(rpm), 
+        //     this
+        // ).withName("SpinToRPM_" + rpm);
+
+        return Commands.run(() -> io.setVoltage(6), this);
     }
 
     /**
