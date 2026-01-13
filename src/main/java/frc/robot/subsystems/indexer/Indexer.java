@@ -21,4 +21,10 @@ public class Indexer extends SubsystemBase {
             .withTimeout(IndexerConstants.kIndexerRunTime)
             .finallyDo(() -> io.setIndexerVoltage(Volts.of(0)));
     }
+    
+    public Command runSecondIndexerOnce() {
+        return run(() -> io.setSecondIndexerVoltage(IndexerConstants.kSecondIndexerOnVoltage))
+            .withTimeout(IndexerConstants.kSecondIndexerRunTime)
+            .finallyDo(() -> io.setSecondIndexerVoltage(Volts.of(0)));
+    }
 }
