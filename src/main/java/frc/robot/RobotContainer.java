@@ -14,6 +14,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -31,9 +32,9 @@ import frc.robot.subsystems.shooterHood.ShooterHoodConstants;
 
 @Logged
 public class RobotContainer {
-    private SwerveDrive swerveDrive = new SwerveDrive();
+    // private SwerveDrive swerveDrive = new SwerveDrive();
     private FuelIntakePivot fuelIntakePivot = new FuelIntakePivot();
-    private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller();
+    private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller(fuelIntakePivot);
     private Indexer indexer = new Indexer();
     private final ShooterHood hood = new ShooterHood();
     private final ShooterFlywheel shooter = new ShooterFlywheel();
@@ -65,6 +66,8 @@ public class RobotContainer {
 
         configureBindings1();
         configureBindings2();
+        
+        // fuelIntakePivot.home().schedule(); // TODO: Test this
 
        //  m_shooterFlywheel.setDefaultCommand(m_shooterFlywheel.set(0));
 
@@ -73,25 +76,13 @@ public class RobotContainer {
     private void configureBindings1() {
       
       
-      
         // call in a periodic or button action:
 
         // new RunCommand(() -> {
             
         // }, swerveDrive).schedule();
         
-        // xButton.whileTrue(
-        //     swerveDrive.GO()
-        // );
-        // xButton.whileFalse(
-        //     swerveDrive.STOP()
-        // );
-        // xButton.whileTrue(swerveDrive.driveFieldCentric(
-        //     1, 0, 0
-        // ));
-        // xButton.whileFalse(swerveDrive.driveFieldCentric(
-        //     0, 0, 0
-        // ));
+        // Trigger xButton = driver.x();
 
         // Trigger lJoy = driver.leftStick();
 
@@ -105,7 +96,6 @@ public class RobotContainer {
             () -> 0, 
             () -> 0
         ));
-
 
 
         // ========= CLIMB CONTROLS =========
@@ -213,14 +203,63 @@ public class RobotContainer {
     }
 
     private void configureBindings2() {
+        // Hold position commands (subsystems continuously run control or set motor voltages)
+        fuelIntakePivot.setDefaultCommand(
+            fuelIntakePivot.holdPosition()
+        );
 
-        
-        
+        fuelIntakeRoller.setDefaultCommand(
+            fuelIntakeRoller.holdRoller()
+        );
+
+
+        // Intake commands
+        Trigger leftBumper = driver.leftBumper();
+        Trigger leftTrigger = driver.leftTrigger();
+
+        leftTrigger.onTrue(
+            Commands.runOnce(() -> {
+                if (fuelIntakePivot.isExtended()
+                    && fuelIntakeRoller.isRollingIn()) {
+
+                    // Toggle OFF
+                    fuelIntakeRoller.setStopped();
+                    fuelIntakePivot.setRetracted();
+
+                } else {
+                    // Turn ON / Change direction
+                    fuelIntakePivot.setExtended();
+                    fuelIntakeRoller.setRollIn();
+                }
+            })
+        );
+
+        leftBumper.onTrue(
+            Commands.runOnce(() -> {
+                if (fuelIntakePivot.isExtended()
+                    && fuelIntakeRoller.isRollingOut()) {
+
+                    // Toggle OFF
+                    fuelIntakeRoller.setStopped();
+                    fuelIntakePivot.setRetracted();
+
+                } else {
+                    // Turn ON / Change direction
+                    fuelIntakePivot.setExtended();
+                    fuelIntakeRoller.setRollOut();
+                }
+            })
+        );
+
+        // TODO: Testing indexer 
+        // TODO: TEMPORARY BINDING, REMOVE LATER
+
+        Trigger rightBumper = driver.rightBumper();
+        rightBumper.onTrue(indexer.runIndexerOnce().andThen(indexer.runSecondIndexerOnce()));
+
+
+
     }
-
-
-   
-
     
 }
 
