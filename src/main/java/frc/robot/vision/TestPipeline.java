@@ -58,8 +58,6 @@ public class TestPipeline implements VisionPipeline {
 		// Mat mat = source0.clone();
 		Mat gray = new Mat();
 		Imgproc.cvtColor(source0, gray, Imgproc.COLOR_BGR2GRAY);
-
-		Dictionary dictionary = Objdetect.getPredefinedDictionary(Objdetect.DICT_APRILTAG_36h11);
 		
 		AprilTagDetection[] detections = detector.detect(gray);
 

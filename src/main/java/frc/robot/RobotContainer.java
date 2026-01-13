@@ -20,6 +20,7 @@ import frc.robot.subsystems.fuelIntakeRoller.FuelIntakeRoller;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.shooterFlywheel.ShooterFlywheel;
 import frc.robot.subsystems.shooterHood.ShooterHood;
+import frc.robot.vision.AprilTagReceiver;
 
 
 
@@ -82,7 +83,7 @@ public class RobotContainer {
             
         // }, swerveDrive).schedule();
         
-        Trigger xButton = driver.x();
+        // Trigger xButton = driver.x();
         // xButton.whileTrue(
         //     swerveDrive.GO()
         // );
@@ -98,16 +99,16 @@ public class RobotContainer {
 
         // Trigger lJoy = driver.leftStick();
 
-        xButton.whileTrue(swerveDrive.driveFieldCentric(
-            driverForward, 
-            driverStrafe, 
-            driverTurn
-        ));
-        xButton.whileFalse(swerveDrive.driveFieldCentric(
-            () -> 0, 
-            () -> 0, 
-            () -> 0
-        ));
+        // xButton.whileTrue(swerveDrive.driveFieldCentric(
+        //     driverForward, 
+        //     driverStrafe, 
+        //     driverTurn
+        // ));
+        // xButton.whileFalse(swerveDrive.driveFieldCentric(
+        //     () -> 0, 
+        //     () -> 0, 
+        //     () -> 0
+        // ));
 
 
         
@@ -118,6 +119,23 @@ public class RobotContainer {
             pigeon.zeroHeading();
             System.out.println("[PIGEON] zeroed");
         }));
+
+        Trigger xButton = driver.x();
+
+        xButton.whileTrue(swerveDrive.driveFieldCentric(
+            () -> 0, 
+            () -> 0, 
+            () -> {
+                double[] tagCenter = AprilTagReceiver.readVisionData();
+                if (tagCenter[0] < 0 || tagCenter[1] < 0) return 0;
+                return Constants.kAutoAimKP * (tagCenter[0] - 320);
+            }
+        ))
+            .whileFalse(swerveDrive.driveFieldCentric(
+            () -> 0, 
+            () -> 0, 
+            () -> 0
+        ));
 
 
 

@@ -3,6 +3,8 @@ package frc.robot;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
+
+    public static final double kAutoAimKP = 0.01;
     
     public static final double ROBOT_MASS = Units.lbsToKilograms(120);
     public static final double MAX_SPEED = Units.feetToMeters(14.5);
