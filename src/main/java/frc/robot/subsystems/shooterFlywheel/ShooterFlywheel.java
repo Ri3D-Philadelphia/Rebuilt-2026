@@ -58,7 +58,7 @@ public class ShooterFlywheel extends SubsystemBase {
     }
 
     public Command powerFlywheel() {
-        return run(() ->io.setVoltage(6));
+        return run(() ->io.setVoltage(4.5));
     }
 
     public Command stop(){
@@ -93,12 +93,12 @@ public class ShooterFlywheel extends SubsystemBase {
      * The command runs continuously - use .withTimeout() or button release to stop.
      */
     public Command spinToRPM(double rpm) {
-        // return Commands.run(
-        //     () -> setVelocityRPM(rpm), 
-        //     this
-        // ).withName("SpinToRPM_" + rpm);
+        return Commands.run(
+            () -> setVelocityRPM(rpm), 
+            this
+        ).withName("SpinToRPM_" + rpm);
 
-        return Commands.run(() -> io.setVoltage(6), this);
+        // return Commands.run(() -> io.setVoltage(6), this);
     }
 
     /**

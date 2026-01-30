@@ -53,13 +53,7 @@ public class ClimbIOSpark implements ClimbIO {
                         .velocityConversionFactor(
                             ClimbConstants.kClimbVelocityConversionFactor)
                         .positionConversionFactor(
-                            ClimbConstants.kClimbPositionConversionFactor))
-                .apply(
-                    new SoftLimitConfig()
-                        .forwardSoftLimit(ClimbConstants.kMaxRotations)
-                        .forwardSoftLimitEnabled(true)
-                        .reverseSoftLimit(ClimbConstants.kMinRotations)
-                        .reverseSoftLimitEnabled(true)),
+                            ClimbConstants.kClimbPositionConversionFactor)),
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters
         );

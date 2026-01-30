@@ -163,14 +163,14 @@ public class Climb extends SubsystemBase {
      *set voltage to 1
      */
     public Command setVoltage1() {
-        return run(() -> io.setClimbVoltage(Volts.of(1)));
+        return run(() -> io.setClimbVoltage(Volts.of(5)));
     }
 
     /**
      *set voltage to -1
      */
     public Command setVoltageminus1() {
-        return run(() -> io.setClimbVoltage(Volts.of(-1)));
+        return run(() -> io.setClimbVoltage(Volts.of(-5)));
     }
 
     /**

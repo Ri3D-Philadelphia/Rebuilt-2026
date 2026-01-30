@@ -12,7 +12,7 @@ public class SwerveDriveConstants {
     public static final double kTrackWidth = 0.4572; // meters
 
     // gamepad
-    public static final double kJoyDriveSpeedFactor = 1.0;
+    public static final double kJoyDriveSpeedFactor = 2.5;
     public static final double kJoyAngleSpeedFactor = 4.0;
 
     public static final double kDriveDeadband = 0.05;

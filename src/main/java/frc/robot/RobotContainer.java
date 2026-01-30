@@ -32,16 +32,17 @@ import frc.robot.subsystems.shooterHood.ShooterHoodConstants;
 
 @Logged
 public class RobotContainer {
-    // private SwerveDrive swerveDrive = new SwerveDrive();
+    private SwerveDrive swerveDrive = new SwerveDrive();
     private FuelIntakePivot fuelIntakePivot = new FuelIntakePivot();
     private FuelIntakeRoller fuelIntakeRoller = new FuelIntakeRoller(fuelIntakePivot);
     private Indexer indexer = new Indexer();
     private final ShooterHood hood = new ShooterHood();
     private final ShooterFlywheel shooter = new ShooterFlywheel();
-    private Climb climb = new Climb();
+    private Climb climb = new Climb
+    ();
 
   
-    // private final Pigeon2Gyro pigeon = new Pigeon2Gyro(30); // CAN ID 30
+    private final Pigeon2Gyro pigeon = new Pigeon2Gyro(30); // CAN ID 30
 
     
     //     public Pigeon2Gyro getPigeon() {
@@ -59,13 +60,12 @@ public class RobotContainer {
             * SwerveDriveConstants.kJoyDriveSpeedFactor;
 
     private DoubleSupplier driverTurn =
-        () -> -MathUtil.applyDeadband(driver.getRightX(), SwerveDriveConstants.kAngleDeadband)
+        () -> MathUtil.applyDeadband(driver.getRightX(), SwerveDriveConstants.kAngleDeadband)
             * SwerveDriveConstants.kJoyAngleSpeedFactor;
 
      public RobotContainer() {
 
-        configureBindings1();
-        configureBindings2();
+        configureBindings();
         
         // fuelIntakePivot.home().schedule(); // TODO: Test this
 
@@ -73,40 +73,19 @@ public class RobotContainer {
 
      }
 
-    private void configureBindings1() {
+    private void configureBindings() {
+
+        // ============= DRIVE CONTROLS =============
       
-      
-        // call in a periodic or button action:
-
-        // new RunCommand(() -> {
-            
-        // }, swerveDrive).schedule();
-        
-        // Trigger xButton = driver.x();
-
-        // Trigger lJoy = driver.leftStick();
-
-        driver.x().whileTrue(swerveDrive.driveFieldCentric(
+        swerveDrive.setDefaultCommand(swerveDrive.driveFieldCentric(
             driverForward, 
             driverStrafe, 
             driverTurn
-        ));
-        swerveDrive.setDefaultCommand(swerveDrive.driveFieldCentric(
-            () -> 0, 
-            () -> 0, 
-            () -> 0
         ));
 
 
         // ========= CLIMB CONTROLS =========
 
-        // driver.x().whileTrue(climb.climbDown()
-        //     .repeatedly()
-        //     .until(climb::atSetpoint));
-        // driver.y().whileTrue(climb.climbUp()
-        //     .repeatedly()
-        //     .until(climb::atSetpoint));
-        
         driver.a().whileTrue(climb.setVoltage1());
         driver.b().whileTrue(climb.setVoltageminus1());
         driver.start().whileTrue(climb.resetEncoder());
@@ -115,78 +94,24 @@ public class RobotContainer {
 
          // ==================== SHOOTING ====================
         
-        // Keep flywheel always spinning at default speed for instant response
-        // shooter.setDefaultCommand(shooter.spinToDefault());
-
         shooter.setDefaultCommand(shooter.stop());
-        
-        // Right Bumper → SHOOT!
-        // Complete shooting sequence: wait for speed → feed note
-        // driver.rightBumper().onTrue(
-        //     Commands.sequence(
-        //         // Ensure shooter is at target speed
-        //         Commands.waitUntil(shooter::atSpeed).withTimeout(1.0),
-                
-        //         // Feed the note for 0.5 seconds
-        //         indexer.runIndexerOnce().withTimeout(0.5),
-                
-        //         // Brief pause after feeding
-        //         Commands.waitSeconds(0.1)
-        //     ).withName("Shoot")
-        // );
 
-        driver.rightTrigger().onTrue(shooter.powerFlywheel()).onFalse(shooter.stop());
+        // driver.rightTrigger().onTrue(shooter.powerFlywheel()).onFalse(shooter.stop());
+        driver.rightTrigger().onTrue(shooter.spinToDefault()).onFalse(shooter.stop());
+        
+        // Shoot via two indexers
+        Trigger rightBumper = driver.rightBumper();
+        rightBumper.onTrue(indexer.runIndexerOnce().andThen(indexer.runSecondIndexerOnce()));
+
         
 
         // ==================== HOOD ANGLE ADJUSTMENT ====================
-        
-        // // DPad Up → Increase hood angle (shoot farther)
-        // driver.povUp().onTrue(
-        //     Commands.parallel(
-        //         hood.adjustAngleCommand(5.0),  // Increase by 5 degrees
-        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
-        //     ).withName("IncreaseShotDistance")
-        // );
-        
-        // // DPad Down → Decrease hood angle (shoot closer)
-        // driver.povDown().onTrue(
-        //     Commands.parallel(
-        //         hood.adjustAngleCommand(-5.0),  // Decrease by 5 degrees
-        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kCloseShootRPM), shooter)
-        //     ).withName("DecreaseShotDistance")
-        // );
-        
-        // // DPad Left → Preset: Close shot
-        // driver.povLeft().onTrue(
-        //     Commands.parallel(
-        //         hood.setAngleCommand(ShooterHoodConstants.kCloseAngleDeg),
-        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
-        //     ).withName("CloseShot")
-        // );
-        
-        // // DPad Right → Preset: Far shot
-        // driver.povRight().onTrue(
-        //     Commands.parallel(
-        //         hood.setAngleCommand(ShooterHoodConstants.kFarAngleDeg),
-        //         Commands.runOnce(() -> shooter.setVelocityRPM(ShooterFlywheelConstants.kFarShootRPM), shooter)
-        //     ).withName("FarShot")
-        // );
-
 
         // DPad Up → Increase hood angle (shoot farther)
-        driver.povUp().onTrue(
-            Commands.parallel(
-                hood.adjustAngleCommand(0.05),  // Increase by 5 degrees
-                Commands.runOnce(() -> shooter.powerFlywheel(), shooter)
-            ).withName("IncreaseShotDistance")
-        );
+        driver.povUp().onTrue(hood.adjustAngleCommand(0.25));
         
         // DPad Down → Decrease hood angle (shoot closer)
-        driver.povDown().onTrue(
-            Commands.parallel(
-                hood.adjustAngleCommand(-0.05),  // Increase by 5 degrees
-                Commands.runOnce(() -> shooter.powerFlywheel(), shooter)
-            ).withName("DecreaseShotDistance"));
+        driver.povDown().onTrue(hood.adjustAngleCommand(-0.25));
         
 
         // ==================== GYRO RESET ====================
@@ -194,68 +119,59 @@ public class RobotContainer {
         // Left Stick & Right Stick (pressed together) → Reset gyro
         driver.leftStick().and(driver.rightStick()).onTrue(
             Commands.runOnce(() -> {
-                // swerveDrive.resetGyro();  // Uncomment when method exists
+                swerveDrive.resetGyro(); 
                 System.out.println("Gyro reset!");
             }).withName("ResetGyro")
         );
 
-      
-    }
+        // /// Fuel Intake
+        // // Hold position commands (subsystems continuously run control or set motor voltages)
+        // fuelIntakePivot.setDefaultCommand(
+        //     fuelIntakePivot.holdPosition()
+        // );
 
-    private void configureBindings2() {
-        // Hold position commands (subsystems continuously run control or set motor voltages)
-        fuelIntakePivot.setDefaultCommand(
-            fuelIntakePivot.holdPosition()
-        );
-
-        fuelIntakeRoller.setDefaultCommand(
-            fuelIntakeRoller.holdRoller()
-        );
+        // fuelIntakeRoller.setDefaultCommand(
+        //     fuelIntakeRoller.holdRoller()
+        // );
 
 
-        // Intake commands
-        Trigger leftBumper = driver.leftBumper();
-        Trigger leftTrigger = driver.leftTrigger();
+        // // Intake commands
+        // Trigger leftBumper = driver.leftBumper();
+        // Trigger leftTrigger = driver.leftTrigger();
 
-        leftTrigger.onTrue(
-            Commands.runOnce(() -> {
-                if (fuelIntakePivot.isExtended()
-                    && fuelIntakeRoller.isRollingIn()) {
+        // leftTrigger.onTrue(
+        //     Commands.runOnce(() -> {
+        //         if (fuelIntakePivot.isExtended()
+        //             && fuelIntakeRoller.isRollingIn()) {
 
-                    // Toggle OFF
-                    fuelIntakeRoller.setStopped();
-                    fuelIntakePivot.setRetracted();
+        //             // Toggle OFF
+        //             fuelIntakeRoller.setStopped();
+        //             fuelIntakePivot.setRetracted();
 
-                } else {
-                    // Turn ON / Change direction
-                    fuelIntakePivot.setExtended();
-                    fuelIntakeRoller.setRollIn();
-                }
-            })
-        );
+        //         } else {
+        //             // Turn ON / Change direction
+        //             fuelIntakePivot.setExtended();
+        //             fuelIntakeRoller.setRollIn();
+        //         }
+        //     })
+        // );
 
-        leftBumper.onTrue(
-            Commands.runOnce(() -> {
-                if (fuelIntakePivot.isExtended()
-                    && fuelIntakeRoller.isRollingOut()) {
+        // leftBumper.onTrue(
+        //     Commands.runOnce(() -> {
+        //         if (fuelIntakePivot.isExtended()
+        //             && fuelIntakeRoller.isRollingOut()) {
 
-                    // Toggle OFF
-                    fuelIntakeRoller.setStopped();
-                    fuelIntakePivot.setRetracted();
+        //             // Toggle OFF
+        //             fuelIntakeRoller.setStopped();
+        //             fuelIntakePivot.setRetracted();
 
-                } else {
-                    // Turn ON / Change direction
-                    fuelIntakePivot.setExtended();
-                    fuelIntakeRoller.setRollOut();
-                }
-            })
-        );
-
-        // TODO: Testing indexer 
-        // TODO: TEMPORARY BINDING, REMOVE LATER
-
-        Trigger rightBumper = driver.rightBumper();
-        rightBumper.onTrue(indexer.runIndexerOnce().andThen(indexer.runSecondIndexerOnce()));
+        //         } else {
+        //             // Turn ON / Change direction
+        //             fuelIntakePivot.setExtended();
+        //             fuelIntakeRoller.setRollOut();
+        //         }
+        //     })
+        // );
 
 
 

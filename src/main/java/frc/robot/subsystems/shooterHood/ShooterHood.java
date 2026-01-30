@@ -59,7 +59,7 @@ public class ShooterHood extends SubsystemBase {
      * Adjust the current target angle by a delta.
      */
     public void adjustAngle(double deltaDeg) {
-        setAngle(bound(targetAngleDeg + deltaDeg, 0, 1));
+        setAngle(bound(targetAngleDeg + deltaDeg, 0, 5));
     }
 
     /**

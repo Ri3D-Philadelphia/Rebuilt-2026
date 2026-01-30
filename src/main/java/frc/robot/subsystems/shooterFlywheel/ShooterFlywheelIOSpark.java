@@ -80,7 +80,7 @@ public class ShooterFlywheelIOSpark implements ShooterFlywheelIO {
     @Override
     public void setVelocityRPM(double rpm) {
         // This tells the SparkFlex to use its internal PID to reach this velocity
-        velocityController.setReference(rpm, ControlType.kVelocity);
+        velocityController.setSetpoint(rpm, ControlType.kVelocity);
     }
 
     @Override

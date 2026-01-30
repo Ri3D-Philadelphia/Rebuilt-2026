@@ -19,8 +19,8 @@ public class IndexerConstants {
     public static final double kIndexerGearing = 1.0; // TODO: ASK MECH
 
     // moc outputs
-    public static final Voltage kIndexerOnVoltage = Volts.of(3);
-    public static final Time kIndexerRunTime = Seconds.of(1);
+    public static final Voltage kIndexerOnVoltage = Volts.of(10);
+    public static final Time kIndexerRunTime = Seconds.of(1.5);
     public static final Voltage kSecondIndexerOnVoltage = Volts.of(3);
     public static final Time kSecondIndexerRunTime = Seconds.of(1);
 

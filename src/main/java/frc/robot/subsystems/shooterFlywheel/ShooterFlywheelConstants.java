@@ -10,7 +10,7 @@ public class ShooterFlywheelConstants {
     public static final int kCurrentLimit = 60;  // NEO Vortex can handle more current
 
     // Shooting parameters
-    public static final double kDefaultShootRPM = 4500;
+    public static final double kDefaultShootRPM = 10000;
     public static final double kRpmTolerance = 100;  // Within 100 RPM = "at speed"
 
     // Closed-loop PID Constants (on-board SparkFlex PID)
